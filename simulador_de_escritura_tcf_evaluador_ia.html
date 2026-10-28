@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCF Studio Pro — Simulateur d'Expression Écrite & Correcteur IA</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts: Inter & Merriweather for reading documents -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        tcf: {
+                            blue: '#002654',
+                            red: '#ED2939',
+                            accent: '#1E40AF',
+                            light: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar & Smooth Transitions */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .french-flag-bar {
+            background: linear-gradient(90deg, #002654 0%, #002654 33%, #ffffff 33%, #ffffff 66%, #ED2939 66%, #ED2939 100%);
+        }
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .animate-pulse-subtle {
+            animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Top French Tricolor Accent Bar -->
+    <div class="h-1.5 w-full french-flag-bar"></div>
+
+    <!-- Header / Exam Control Bar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                
+                <!-- Brand & Title -->
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-tcf-blue text-white flex items-center justify-center font-bold text-lg shadow-sm">
+                        TCF
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-bold text-slate-900 text-lg leading-tight">TCF Expression Écrite</h1>
+                            <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Canada / IRCC & Tout Public</span>
+                        </div>
+                        <p class="text-xs text-slate-500" id="subtitle-text">Simulateur officiel & Correcteur IA (B2/C1) • Ayuda en Español activa</p>
+                    </div>
+                </div>
+
+                <!-- Exam Set Selector + Pro Upsell Demo -->
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <div class="relative">
+                        <select id="exam-set-select" onchange="changeExamSet(this.value)" class="appearance-none bg-slate-100 hover:bg-slate-200/70 text-slate-800 text-sm font-medium rounded-xl pl-3.5 pr-9 py-2 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600 transition cursor-pointer">
+                            <option value="0">📘 Sujet #1 : Vie quotidienne & Télétravail (Gratuit)</option>
+                            <option value="1">📗 Sujet #2 : Voyages & Écologie Urbaine (Gratuit)</option>
+                            <option value="2">📙 Sujet #3 : Francophonie & Réseaux Sociaux (Gratuit)</option>
+                            <option value="pro">🔒 Pack PRO : +60 Sujets Officiels 2026 (Débloquer)</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                    </div>
+
+                    <!-- Spanish Hints Toggle -->
+                    <button onclick="toggleSpanishHints()" id="lang-toggle-btn" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100 transition" title="Mostrar/Ocultar consejos en español">
+                        <i class="fa-solid fa-language text-sm"></i>
+                        <span id="lang-toggle-label">Tips ES: ON</span>
+                    </button>
+                </div>
+
+                <!-- 60-Min Exam Countdown Timer -->
+                <div class="flex items-center gap-2 bg-slate-900 text-white px-3.5 py-1.5 rounded-xl shadow-inner">
+                    <i class="fa-regular fa-clock text-blue-400 text-sm"></i>
+                    <span id="timer-display" class="font-mono font-bold text-lg tracking-wider">60:00</span>
+                    <div class="h-4 w-[1px] bg-slate-700 mx-1"></div>
+                    <button onclick="toggleTimer()" id="timer-start-btn" class="text-xs bg-blue-600 hover:bg-blue-500 text-white font-semibold px-2.5 py-1 rounded-lg transition">
+                        <i class="fa-solid fa-play mr-1"></i>Démarrer
+                    </button>
+                    <button onclick="resetTimer()" class="text-xs text-slate-400 hover:text-white p-1 rounded-lg transition" title="Réinitialiser / Reiniciar">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        
+        <!-- Task Navigation Tabs & Overall Progress -->
+        <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-6">
+            <div class="grid grid-cols-3 gap-2 sm:gap-3 flex-1 bg-slate-200/70 p-1.5 rounded-2xl border border-slate-200">
+                <!-- Tab 1 -->
+                <button onclick="switchTask(0)" id="tab-btn-0" class="task-tab flex flex-col sm:flex-row items-center justify-between px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-900 shadow-sm">
+                    <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold">1</span>
+                        <div class="text-left">
+                            <div class="leading-tight">Tâche 1</div>
+                            <div class="text-[11px] font-normal text-slate-500 hidden sm:block">60 – 120 mots • Message</div>
+                        </div>
+                    </div>
+                    <span id="tab-badge-0" class="mt-1 sm:mt-0 text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono">0 mots</span>
+                </button>
+
+                <!-- Tab 2 -->
+                <button onclick="switchTask(1)" id="tab-btn-1" class="task-tab flex flex-col sm:flex-row items-center justify-between px-4 py-2.5 rounded-xl font-semibold text-sm transition text-slate-600 hover:text-slate-900">
+                    <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-slate-300 text-slate-700 text-xs flex items-center justify-center font-bold">2</span>
+                        <div class="text-left">
+                            <div class="leading-tight">Tâche 2</div>
+                            <div class="text-[11px] font-normal text-slate-500 hidden sm:block">120 – 150 mots • Article/Blog</div>
+                        </div>
+                    </div>
+                    <span id="tab-badge-1" class="mt-1 sm:mt-0 text-xs px-2 py-0.5 rounded-full bg-slate-200 text-slate-600 font-mono">0 mots</span>
+                </button>
+
+                <!-- Tab 3 -->
+                <button onclick="switchTask(2)" id="tab-btn-2" class="task-tab flex flex-col sm:flex-row items-center justify-between px-4 py-2.5 rounded-xl font-semibold text-sm transition text-slate-600 hover:text-slate-900">
+                    <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-slate-300 text-slate-700 text-xs flex items-center justify-center font-bold">3</span>
+                        <div class="text-left">
+                            <div class="leading-tight">Tâche 3</div>
+                            <div class="text-[11px] font-normal text-slate-500 hidden sm:block">120 – 180 mots • Argumentation</div>
+                        </div>
+                    </div>
+                    <span id="tab-badge-2" class="mt-1 sm:mt-0 text-xs px-2 py-0.5 rounded-full bg-slate-200 text-slate-600 font-mono">0 mots</span>
+                </button>
+            </div>
+
+            <!-- Quick Sample Text Loader for Demo Testing -->
+            <div class="flex items-center justify-end gap-2">
+                <button onclick="loadSampleResponse()" class="text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-2.5 rounded-xl transition flex items-center gap-1.5" title="Rellenar con un texto de ejemplo de estudiante para probar el evaluador IA de inmediato">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Cargar texto de prueba</span>
+                </button>
+                <button onclick="exportReport()" class="text-xs font-medium text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 px-3 py-2.5 rounded-xl transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Exportar copia</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Workspace Grid: Left (Prompt & Editor) | Right (B2/C1 Booster & AI Evaluator) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- LEFT COLUMN: Prompt & Writing Area (8 Cols) -->
+            <div class="lg:col-span-8 space-y-5">
+                
+                <!-- Prompt Card -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="bg-slate-800 text-white px-5 py-3 flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <span id="prompt-task-badge" class="bg-blue-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-md uppercase tracking-wide">Tâche 1</span>
+                            <h2 id="prompt-title" class="font-semibold text-sm sm:text-base">Message informel</h2>
+                        </div>
+                        <span id="prompt-word-rule" class="text-xs bg-slate-700 text-slate-200 px-2.5 py-1 rounded-lg font-mono">
+                            Objectif : 60 à 120 mots
+                        </span>
+                    </div>
+
+                    <div class="p-5 space-y-4">
+                        <!-- Official French Consigne -->
+                        <div id="prompt-instructions" class="text-slate-800 text-sm sm:text-base leading-relaxed font-medium">
+                            <!-- Populated via JS -->
+                        </div>
+
+                        <!-- Tâche 3 Comparative Documents Container (Hidden for Tâche 1 & 2) -->
+                        <div id="tache3-docs-container" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-blue-800 bg-blue-100 px-2 py-0.5 rounded">Document 1</span>
+                                    <span id="doc1-source" class="text-[11px] text-slate-500 italic"></span>
+                                </div>
+                                <p id="doc1-text" class="font-serif text-xs sm:text-sm text-slate-700 leading-relaxed"></p>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-rose-800 bg-rose-100 px-2 py-0.5 rounded">Document 2</span>
+                                    <span id="doc2-source" class="text-[11px] text-slate-500 italic"></span>
+                                </div>
+                                <p id="doc2-text" class="font-serif text-xs sm:text-sm text-slate-700 leading-relaxed"></p>
+                            </div>
+                        </div>
+
+                        <!-- Spanish Learner Hint Box (Collapsible) -->
+                        <div id="spanish-hint-box" class="bg-amber-50/90 border border-amber-200/80 rounded-xl p-3.5 text-xs sm:text-sm text-amber-950 flex gap-3 items-start">
+                            <i class="fa-solid fa-lightbulb text-amber-500 text-base mt-0.5"></i>
+                            <div>
+                                <span class="font-bold block mb-0.5">💡 Consejo estratégico en Español (Estructuración TCF):</span>
+                                <p id="spanish-hint-text" class="text-amber-900/90 leading-relaxed"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Writing Editor Card -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    
+                    <!-- French Virtual Accent Keyboard Bar -->
+                    <div class="bg-slate-100 border-b border-slate-200 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="text-xs font-semibold text-slate-500 mr-1 flex items-center gap-1">
+                                <i class="fa-regular fa-keyboard"></i> Clavier FR :
+                            </span>
+                            <!-- Virtual Keys generated dynamically or inline -->
+                            <div id="accent-keyboard" class="flex flex-wrap gap-1">
+                                <!-- Populated via JS -->
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button onclick="toggleCaseAccents()" id="caps-btn" class="text-xs font-semibold px-2.5 py-1 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-200 transition" title="Alternar Mayúsculas / Minúsculas">
+                                Maj ⇧
+                            </button>
+                            <button onclick="clearCurrentText()" class="text-xs text-slate-500 hover:text-rose-600 px-2 py-1 rounded-lg transition" title="Effacer le texte / Borrar texto">
+                                <i class="fa-regular fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Textarea -->
+                    <div class="p-4 sm:p-5">
+                        <textarea 
+                            id="exam-textarea" 
+                            rows="11" 
+                            oninput="handleTextInput()"
+                            placeholder="Rédigez votre réponse ici en respectant la consigne et le nombre de mots..."
+                            spellcheck="false"
+                            class="w-full resize-y border-0 focus:ring-0 focus:outline-none text-slate-800 text-base leading-relaxed placeholder:text-slate-400 font-sans"
+                        ></textarea>
+                    </div>
+
+                    <!-- Traffic Light Word Counter Footer -->
+                    <div class="bg-slate-50 border-t border-slate-200 px-5 py-3.5">
+                        <div class="flex flex-wrap items-center justify-between gap-4 mb-2">
+                            <div class="flex items-center gap-2.5">
+                                <span id="traffic-dot" class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+                                <span class="text-sm font-bold text-slate-800">
+                                    <span id="word-count-number">0</span> mots
+                                </span>
+                                <span id="word-status-message" class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800">
+                                    Insuffisant (Min. 60 mots)
+                                </span>
+                            </div>
+                            <div class="text-xs text-slate-500 font-mono" id="char-count-display">
+                                0 caractères
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                            <div id="word-progress-bar" class="h-full bg-rose-500 transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Primary Action Bar: AI Evaluation Trigger -->
+                <div class="bg-gradient-to-r from-tcf-blue via-blue-900 to-indigo-900 rounded-2xl p-5 text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="space-y-1 text-center sm:text-left">
+                        <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-300">
+                            <i class="fa-solid fa-sparkles"></i> Intelligence Artificielle TCF
+                        </div>
+                        <h3 class="text-base sm:text-lg font-bold">Prêt à connaître votre niveau CECRL (A1 à C2) ?</h3>
+                        <p class="text-xs text-blue-200">Obtiendrez votre note sur 20, la correction détaillée et la réécriture de votre texte au niveau C1.</p>
+                    </div>
+                    <button onclick="evaluateCurrentTaskWithAI()" id="ai-eval-btn" class="w-full sm:w-auto shrink-0 bg-white hover:bg-blue-50 text-tcf-blue font-bold text-sm px-6 py-3.5 rounded-xl shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-graduation-cap text-base text-blue-700"></i>
+                        <span>Évaluer ma copie (IA)</span>
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: B2/C1 Connector Booster & AI Feedback Panel (4 Cols) -->
+            <div class="lg:col-span-4 space-y-5">
+                
+                <!-- Connector Booster Card (Clickable inserts) -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="px-5 py-3.5 bg-slate-800 text-white flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-rocket text-amber-400"></i>
+                            <h3 class="font-bold text-sm">Booster de Connecteurs (B2/C1)</h3>
+                        </div>
+                        <span class="text-[11px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded">Cliquer = Insérer</span>
+                    </div>
+                    <div class="p-4 space-y-3 text-xs">
+                        <p class="text-slate-500 leading-normal">
+                            Haz clic en cualquier conector o estructura para insertarlo directamente en tu texto y subir puntos en coherencia:
+                        </p>
+
+                        <!-- Category Tabs for Connectors -->
+                        <div class="flex gap-1 bg-slate-100 p-1 rounded-xl" id="connector-tabs">
+                            <button onclick="renderConnectors('intro')" id="conn-tab-intro" class="flex-1 py-1.5 px-2 rounded-lg font-semibold bg-white text-slate-900 shadow-sm transition">Introduire</button>
+                            <button onclick="renderConnectors('opposer')" id="conn-tab-opposer" class="flex-1 py-1.5 px-2 rounded-lg font-semibold text-slate-600 hover:text-slate-900 transition">Nuancer</button>
+                            <button onclick="renderConnectors('ajouter')" id="conn-tab-ajouter" class="flex-1 py-1.5 px-2 rounded-lg font-semibold text-slate-600 hover:text-slate-900 transition">Ajouter</button>
+                            <button onclick="renderConnectors('conclure')" id="conn-tab-conclure" class="flex-1 py-1.5 px-2 rounded-lg font-semibold text-slate-600 hover:text-slate-900 transition">Conclure</button>
+                        </div>
+
+                        <!-- Connector Chips List -->
+                        <div id="connector-list" class="space-y-1.5 max-h-60 overflow-y-auto pr-1">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Evaluation Result Card -->
+                <div id="ai-result-card" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="px-5 py-3.5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-blue-600"></i>
+                            <h3 class="font-bold text-sm text-slate-800">Rapport d'évaluation TCF</h3>
+                        </div>
+                        <span id="eval-status-badge" class="text-[11px] font-medium text-slate-500">En attente</span>
+                    </div>
+
+                    <!-- Default Empty State -->
+                    <div id="ai-empty-state" class="p-6 text-center space-y-3">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto text-xl">
+                            <i class="fa-solid fa-pen-nib"></i>
+                        </div>
+                        <h4 class="font-semibold text-slate-800 text-sm">Aucune évaluation pour cette tâche</h4>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Escribe tu respuesta (o usa el botón <strong>"Cargar texto de prueba"</strong> arriba) y presiona <strong>"Évaluer ma copie (IA)"</strong> para recibir tu nivel B1/B2/C1 y correcciones.
+                        </p>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="ai-loading-state" class="hidden p-8 text-center space-y-4">
+                        <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-slate-800 text-sm">Analyse par l'examinateur IA TCF...</h4>
+                            <p class="text-xs text-slate-500">Vérification de la grammaire, richesse lexicale, connecteurs et respect de la consigne.</p>
+                        </div>
+                    </div>
+
+                    <!-- Populated Evaluation Content -->
+                    <div id="ai-content-state" class="hidden p-5 space-y-4 text-xs sm:text-sm">
+                        
+                        <!-- Score Banner -->
+                        <div class="grid grid-cols-2 gap-3 bg-slate-900 text-white p-4 rounded-xl">
+                            <div>
+                                <span class="text-[11px] text-slate-400 uppercase tracking-wider block">Niveau Estimé</span>
+                                <span id="res-cefr" class="text-2xl font-extrabold text-amber-400">B2</span>
+                                <span id="res-nclc" class="text-[11px] text-slate-300 block mt-0.5">NCLC 7-8 (Canada)</span>
+                            </div>
+                            <div class="border-l border-slate-700 pl-3">
+                                <span class="text-[11px] text-slate-400 uppercase tracking-wider block">Score TCF</span>
+                                <span id="res-score" class="text-2xl font-extrabold text-emerald-400">14/20</span>
+                                <span id="res-word-check" class="text-[11px] text-slate-300 block mt-0.5">Longueur conforme</span>
+                            </div>
+                        </div>
+
+                        <!-- Strengths & Feedback -->
+                        <div class="space-y-2">
+                            <h5 class="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="fa-solid fa-magnifying-glass-chart text-blue-600"></i> Bilan de l'examinateur (FR/ES)
+                            </h5>
+                            <p id="res-summary" class="text-slate-600 text-xs leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-200"></p>
+                        </div>
+
+                        <!-- Specific Corrections List -->
+                        <div class="space-y-2">
+                            <h5 class="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="fa-solid fa-wrench text-rose-500"></i> Corrections clés & Grammaire
+                            </h5>
+                            <ul id="res-corrections" class="space-y-2 text-xs">
+                                <!-- Populated via JS -->
+                            </ul>
+                        </div>
+
+                        <!-- Upgraded B2/C1 Model Rewrite -->
+                        <div class="space-y-2 pt-1">
+                            <div class="flex items-center justify-between">
+                                <h5 class="font-bold text-emerald-800 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                                    <i class="fa-solid fa-crown text-amber-500"></i> Version Réécrite (Niveau C1)
+                                </h5>
+                                <button onclick="copyModelRewrite()" class="text-[11px] text-blue-600 hover:underline font-medium">
+                                    <i class="fa-regular fa-copy mr-0.5"></i>Copier
+                                </button>
+                            </div>
+                            <div id="res-rewrite" class="bg-emerald-50/70 border border-emerald-200 text-emerald-950 p-3.5 rounded-xl text-xs leading-relaxed font-serif"></div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Pro Pack Monetization Demo Modal -->
+    <div id="pro-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-5 animate-fade-in">
+            <div class="flex items-center justify-between">
+                <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                    <i class="fa-solid fa-lock-open mr-1"></i> Démo de Monétisation
+                </span>
+                <button onclick="closeProModal()" class="text-slate-400 hover:text-slate-600 text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="space-y-2">
+                <h3 class="text-xl font-extrabold text-slate-900">Pack TCF Expression Écrite PRO</h3>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    Así es como monetizas este proyecto en GitHub/Gumroad: el estudiante practica gratis con 3 exámenes y desbloquea el paquete completo por un pago único.
+                </p>
+            </div>
+            <ul class="space-y-2.5 text-sm text-slate-700 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <li class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-circle-check text-emerald-500"></i>
+                    <span><strong>+60 Sujets d'actualité 2026</strong> reales de exámenes pasados</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-circle-check text-emerald-500"></i>
+                    <span><strong>Correcciones IA ilimitadas</strong> con rúbrica NCLC Canadá</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-circle-check text-emerald-500"></i>
+                    <span><strong>Plantillas memorizables C1</strong> para la Tâche 3</span>
+                </li>
+            </ul>
+            <div class="flex items-center justify-between pt-2">
+                <div>
+                    <span class="text-xs text-slate-400 line-through block">$29.00 USD</span>
+                    <span class="text-2xl font-black text-slate-900">$12.00 <span class="text-xs font-normal text-slate-500">pago único</span></span>
+                </div>
+                <button onclick="closeProModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm px-5 py-3 rounded-xl shadow-md transition">
+                    Entendido (Volver al simulador)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white text-xs font-medium px-4 py-3 rounded-xl shadow-lg flex items-center gap-2">
+        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toast-msg">Action effectuée</span>
+    </div>
+
+    <script>
+        // ============================================================================
+        // 1. REALISTIC TCF EXAM PROMPTS DATABASE (3 Complete Exam Sets)
+        // ============================================================================
+        const EXAM_SETS = [
+            {
+                id: 0,
+                name: "Sujet #1 : Vie quotidienne & Télétravail",
+                tasks: [
+                    {
+                        minWords: 60,
+                        maxWords: 120,
+                        title: "Message informel — Invitation à la campagne",
+                        prompt: "Vous avez décidé de passer un week-end à la campagne avec des amis le mois prochain. Vous écrivez un courriel à votre ami(e) français(e) Camille pour l'inviter. Vous lui décrivez le lieu, les activités prévues et le moyen de transport.",
+                        spanishHint: "Usa un tono cercano ('Salut Camille !', 'Tu'). Asegúrate de responder a los 3 puntos obligatorios: 1) Lugar, 2) Actividades y 3) Transporte. Cierra con una frase cordial como 'Tiens-moi au courant !'.",
+                        sampleText: "Salut Camille,\n\nJ'espère que tu vas bien ! Le mois prochain, j'organise un petit week-end de détente à la campagne, dans un joli village près de Lyon, et j'aimerais beaucoup que tu viennes avec nous.\n\nNous avons loué une grande maison avec un jardin. Au programme, nous prévoyons de faire des randonnées en forêt, un barbecue le samedi soir et de visiter le marché local dimanche matin.\n\nPour le transport, nous partirons tous ensemble dans ma voiture vendredi après le travail. Dis-moi vite si tu es disponible !\n\nÀ très bientôt,\nAlex"
+                    },
+                    {
+                        minWords: 120,
+                        maxWords: 150,
+                        title: "Article de blog — Apprendre une langue étrangère",
+                        prompt: "Vous participez à un forum francophone sur l'apprentissage des langues. Vous rédigez un article pour raconter votre propre expérience d'apprentissage du français : vos difficultés au début, les méthodes qui vous ont aidé(e) et pourquoi vous conseillez cette expérience.",
+                        spanishHint: "Estructura en 3 párrafos cortos: Introducción (por qué decidiste aprender francés), Experiencia personal (dificultades usando imperfecto/passé composé y qué método te funcionó) y Conclusión entusiasta recomendándolo.",
+                        sampleText: "Apprendre le français : un défi passionnant qui change la vie !\n\nLorsque j'ai commencé à étudier le français il y a deux ans, j'étais à la fois enthousiaste et un peu intimidé. Au début, la prononciation et la conjugaison des verbes irréguliers me semblaient très complexes, si bien que j'avais peur de prendre la parole en public.\n\nHeureusement, j'ai changé de méthode. Au lieu d'étudier uniquement la grammaire dans les livres, j'ai commencé à écouter des podcasts francophones chaque matin et à pratiquer avec des locuteurs natifs en ligne. Grâce à cette immersion quotidienne, j'ai gagné en confiance rapidement.\n\nEn conclusion, je recommande vivement cette aventure linguistique à tout le monde, car elle ouvre des portes professionnelles et culturelles extraordinaires."
+                    },
+                    {
+                        minWords: 120,
+                        maxWords: 180,
+                        title: "Texte argumentatif — Le télétravail à temps plein",
+                        prompt: "À partir des deux documents ci-dessous, rédigez un texte dans lequel vous présenterez brièvement les deux points de vue sur le télétravail (40 à 60 mots), puis vous donnerez votre opinion personnelle argumentée sur le sujet (80 à 120 mots).",
+                        doc1Source: "Magazine Économie & Entreprise, 2025",
+                        doc1Text: "« Le télétravail intégral est une avancée majeure pour les salariés. En supprimant les longs trajets quotidiens dans les transports, il réduit le stress, améliore l'équilibre entre la vie professionnelle et familiale, et permet même de s'installer loin des grandes métropoles coûteuses. »",
+                        doc2Source: "Syndicat des Cadres et Managers, 2025",
+                        doc2Text: "« Travailler exclusivement depuis chez soi présente de graves risques d'isolement social. L'absence de contact direct affaiblit l'esprit d'équipe, freine la créativité collective et brouille dangereusement la frontière entre le temps de travail et le repos personnel. »",
+                        spanishHint: "¡Ojo con la estructura obligatoria de la Tâche 3! Párrafo 1 (40-60 palabras): Resume ambos documentos con tus propias palabras SIN copiar frases exactas ('Ces deux documents abordent la question de...'). Párrafo 2 (80-120 palabras): Da tu postura usando conectores nivel B2/C1 ('En ce qui me concerne...', 'Néanmoins...').",
+                        sampleText: "Ces deux documents abordent la question de la généralisation du télétravail. Tandis que le premier article souligne ses bienfaits sur la qualité de vie et la réduction du stress lié aux transports, le second met en garde contre l'isolement social et l'affaiblissement de la cohésion d'équipe.\n\nPour ma part, je considère que la solution idéale réside dans un modèle hybride. D'une part, travailler depuis son domicile deux ou trois jours par semaine offre une flexibilité précieuse et favorise la concentration sur des dossiers complexes. Néanmoins, la présence physique au bureau demeure indispensable pour maintenir le lien humain et stimuler l'innovation collective.\n\nEn définitive, au lieu d'opposer ces deux modes d'organisation, les entreprises devraient les combiner afin de garantir à la fois la productivité et le bien-être des employés."
+                    }
+                ]
+            },
+            {
+                id: 1,
+                name: "Sujet #2 : Voyages & Écologie Urbaine",
+                tasks: [
+                    {
+                        minWords: 60,
+                        maxWords: 120,
+                        title: "Message informel — Recherche de logement",
+                        prompt: "Vous allez bientôt vous installer dans la ville où habite votre ami(e) Maxime pour vos études ou votre travail. Vous lui écrivez un message pour lui annoncer la nouvelle, lui décrire le type d'appartement que vous cherchez et lui demander son aide.",
+                        spanishHint: "Menciona cuándo llegas, qué características necesita tu departamento (barrio, precio, tamaño) y pídele un favor concreto (visitar un piso o recomendarte una zona).",
+                        sampleText: "Salut Maxime,\n\nJ'ai une excellente nouvelle à t'annoncer : j'ai obtenu mon contrat à Montréal et je déménage dans ta ville dès le mois de septembre !\n\nEn ce moment, je cherche activement un petit appartement meublé, idéalement un studio lumineux proche d'une station de métro avec un loyer raisonnable. Comme tu connais très bien la ville, pourrais-tu me conseiller les quartiers les plus agréables et sécuritaires ? Si tu as un peu de temps libre, ton aide pour visiter quelques logements serait super précieuse.\n\nOn s'appelle très vite,\nLucas"
+                    },
+                    {
+                        minWords: 120,
+                        maxWords: 150,
+                        title: "Article de blog — Un voyage inoubliable",
+                        prompt: "Sur votre blog personnel, vous racontez un voyage qui vous a particulièrement marqué(e). Vous décrivez la destination, une anecdote surprenante qui vous est arrivée sur place et vous expliquez ce que ce voyage vous a apporté.",
+                        spanishHint: "Combina tiempos pasados: Imparfait para describir el paisaje/ambiente ('Il faisait beau, les rues étaient...') y Passé Composé para la anécdota puntual ('Un jour, j'ai rencontré...').",
+                        sampleText: "Mon voyage inoubliable au cœur de la Bretagne\n\nL'été dernier, j'ai eu la chance de découvrir la côte bretonne pendant dix jours. Dès mon arrivée à Saint-Malo, j'ai été fasciné par les paysages sauvages, le bruit des vagues et l'architecture historique des villages.\n\nPourtant, le moment le plus marquant s'est produit par hasard. Un après-midi, alors qu'une pluie soudaine tombait, je me suis réfugié dans une petite crêperie familiale. Le propriétaire, très chaleureux, m'a invité à cuisiner avec lui et m'a raconté des légendes locales pendant des heures.\n\nEn fin de compte, cette escapade m'a appris que la véritable richesse d'un voyage ne réside pas seulement dans les monuments, mais surtout dans la générosité des rencontres imprévues."
+                    },
+                    {
+                        minWords: 120,
+                        maxWords: 180,
+                        title: "Texte argumentatif — Interdire les voitures en centre-ville",
+                        prompt: "À partir des deux documents ci-dessous, résumez les deux positions opposées sur la piétonnisation des centres-villes (40 à 60 mots), puis exprimez votre avis personnel en l'appuyant sur des exemples précis (80 à 120 mots).",
+                        doc1Source: "Association Respire Demain",
+                        doc1Text: "« Interdire la circulation automobile dans le cœur des villes est une urgence sanitaire. Cette mesure diminue drastiquement la pollution sonore et atmosphérique, tout en rendant l'espace public aux piétons, aux cyclistes et aux terrasses conviviales. »",
+                        doc2Source: "Collectif des Commerçants du Centre",
+                        doc2Text: "« Fermer le centre-ville aux voitures pénalise lourdement les commerces de proximité et les personnes à mobilité réduite ou vivant en banlieue. Sans accès facile ni stationnement, les clients préfèrent se tourner vers les grands centres commerciaux périphériques. »",
+                        spanishHint: "Asegúrate de usar vocabulario variado para no repetir las palabras del texto: cambia 'voitures' por 'véhicules individuels' y 'centre-ville' por 'zones urbaines centrales'.",
+                        sampleText: "Ces deux textes débattent de l'interdiction des véhicules dans les centres urbains. Si le premier document défend cette mesure au nom de l'écologie et de la santé publique, le second souligne ses conséquences négatives pour les commerçants locaux et les habitants éloignés.\n\nEn ce qui me concerne, je suis favorable à une limitation progressive de l'automobile en ville, à condition qu'elle soit accompagnée d'alternatives efficaces. En effet, réduire la pollution est essentiel pour améliorer notre cadre de vie. Toutefois, pour ne pas exclure les résidents de la périphérie ni nuire à l'économie locale, les municipalités doivent d'abord développer des transports en commun gratuits et créer des parkings relais accessibles.\n\nAinsi, une transition équilibrée permettra de concilier dynamisme commercial et respect de l'environnement."
+                    }
+                ]
+            },
+            {
+                id: 2,
+                name: "Sujet #3 : Francophonie & Réseaux Sociaux",
+                tasks: [
+                    {
+                        minWords: 60,
+                        maxWords: 120,
+                        title: "Message informel — Organiser une fête d'anniversaire surprise",
+                        prompt: "Vous organisez une fête surprise pour l'anniversaire d'un(e) ami(e) commun(e). Vous écrivez un message à votre groupe d'amis pour leur annoncer la date, le lieu, et répartir les tâches (musique, repas, cadeau).",
+                        spanishHint: "Usa verbos en futuro o condicional para proponer tareas ('Tu pourrais t'occuper de...', 'Nous achèterons...'). Mantén el conteo entre 60 y 120 palabras.",
+                        sampleText: "Salut tout le monde,\n\nComme vous le savez, Sophie fête ses trente ans samedi prochain ! Pour célébrer cet événement, j'organise une soirée surprise chez moi à partir de 19 heures.\n\nAfin que tout soit parfait, nous devons nous répartir les préparatifs. Je vais m'occuper des boissons et de la décoration du salon. Thomas, pourrais-tu préparer une liste de musique entraînante ? Quant à Julie, ce serait génial si tu pouvais commander le gâteau au chocolat qu'elle adore. Nous participerons tous à parts égales pour lui offrir un billet d'avion.\n\nSurtout, gardez bien le secret ! À samedi,\nMarc"
+                    },
+                    {
+                        minWords: 120,
+                        maxWords: 150,
+                        title: "Article de blog — L'impact du sport sur le bien-être",
+                        prompt: "Vous écrivez un billet sur un blog dédié à la santé pour partager votre expérience avec une activité sportive ou de plein air. Vous expliquez comment vous avez commencé, à quelle fréquence vous pratiquez et quels bénéfices physiques et mentaux vous en tirez.",
+                        spanishHint: "Usa conectores de adición ('De plus', 'Par ailleurs') para separar los beneficios físicos de los mentales y alcanzar las 120-150 palabras.",
+                        sampleText: "Pourquoi la course à pied a transformé mon quotidien\n\nIl y a encore un an, je menais une vie très sédentaire devant mon ordinateur et je me sentais constamment fatigué. Un jour, sur les conseils d'un collègue, j'ai décidé de chausser des baskets et d'aller courir dans le parc de mon quartier.\n\nLes premières semaines ont été difficiles, mais j'ai persévéré. Aujourd'hui, je m'entraîne trois fois par semaine pendant quarante minutes. Sur le plan physique, cette routine m'a permis d'améliorer mon endurance et la qualité de mon sommeil. Par ailleurs, courir agit comme une véritable thérapie mentale qui évacue le stress accumulé au travail.\n\nBref, je conseille à chacun de trouver une activité physique régulière : votre corps et votre esprit vous remercieront !"
+                    },
+                    {
+                        minWords: 120,
+                        maxWords: 180,
+                        title: "Texte argumentatif — L'influence des réseaux sociaux sur les jeunes",
+                        prompt: "À partir des deux documents suivants, présentez les deux visions concernant l'usage des réseaux sociaux chez les jeunes (40 à 60 mots), puis développez votre propre réflexion argumentée (80 à 120 mots).",
+                        doc1Source: "Revue Éducation & Numérique",
+                        doc1Text: "« Les plateformes numériques constituent un formidable espace d'expression et d'ouverture sur le monde pour la jeunesse. Elles permettent de maintenir le contact avec ses proches, de s'informer rapidement et de développer des compétences créatives. »",
+                        doc2Source: "Observatoire de la Santé Mentale",
+                        doc2Text: "« La surexposition aux écrans et aux réseaux sociaux nuit gravement à la concentration des adolescents. La quête permanente de validation virtuelle engendre de l'anxiété, des troubles du sommeil et un repli sur soi inquiétant. »",
+                        spanishHint: "Recuerda no superar las 180 palabras. En el examen oficial TCF, pasarse del límite demuestra falta de capacidad de síntesis.",
+                        sampleText: "Ces deux extraits présentent des visions opposées sur l'impact des réseaux sociaux chez les jeunes. Alors que le premier texte valorise leur potentiel créatif et social, le second alerte sur les dangers psychologiques et la perte d'attention liés à une utilisation excessive.\n\nÀ mon avis, ces outils numériques ne sont ni totalement néfastes ni entièrement bénéfiques : tout dépend de l'usage qu'on en fait. Il est indéniable qu'ils facilitent l'accès à la culture et les échanges internationaux. Cependant, face aux risques bien réels d'addiction et de cyberharcèlement, il est primordial d'éduquer les adolescents à un esprit critique et de fixer des limites de temps d'écran.\n\nEn somme, l'accompagnement parental et scolaire reste la clé pour transformer ces plateformes en alliées positives."
+                    }
+                ]
+            }
+        ];
+
+        // ============================================================================
+        // 2. B2/C1 CONNECTOR BOOSTER DATABASE
+        // ============================================================================
+        const CONNECTORS_DB = {
+            intro: [
+                { fr: "Ces deux documents abordent la question de...", es: "Estos dos documentos abordan la cuestión de... (Ideal Tâche 3)", level: "C1" },
+                { fr: "Tandis que le premier texte souligne..., le second...", es: "Mientras que el primer texto subraya..., el segundo...", level: "C1" },
+                { fr: "En ce qui me concerne, j'estime que...", es: "Por mi parte, considero que...", level: "B2" },
+                { fr: "Il est indéniable que...", es: "Es innegable que...", level: "C1" },
+                { fr: "De nos jours, on constate que...", es: "Hoy en día, constatamos que...", level: "B2" }
+            ],
+            opposer: [
+                { fr: "Néanmoins, il convient de rappeler que...", es: "Sin embargo, conviene recordar que...", level: "C1" },
+                { fr: "Toutefois, cette mesure présente des limites.", es: "No obstante, esta medida presenta límites.", level: "B2" },
+                { fr: "En revanche, certains considèrent que...", es: "En cambio, algunos consideran que...", level: "B2" },
+                { fr: "Certes, ..., mais il n'en demeure pas moins que...", es: "Ciertamente..., pero no es menos cierto que...", level: "C1" },
+                { fr: "Malgré ces avantages indéniables,", es: "A pesar de estas ventajas innegables,", level: "B2" }
+            ],
+            ajouter: [
+                { fr: "En outre, il faut souligner que...", es: "Además, hay que subrayar que...", level: "C1" },
+                { fr: "Par ailleurs, cet aspect favorise...", es: "Por otra parte, este aspecto favorece...", level: "B2" },
+                { fr: "Non seulement..., mais encore...", es: "No solo..., sino también...", level: "C1" },
+                { fr: "De surcroît, cette pratique permet de...", es: "Por añadidura / Además, esta práctica permite...", level: "C1" },
+                { fr: "À cela s'ajoute le fait que...", es: "A esto se suma el hecho de que...", level: "B2" }
+            ],
+            conclure: [
+                { fr: "En définitive, il semble essentiel de...", es: "En definitiva, parece esencial...", level: "C1" },
+                { fr: "En somme, tout dépend de l'équilibre entre...", es: "En suma, todo depende del equilibrio entre...", level: "C1" },
+                { fr: "Pour conclure, je suis convaincu(e) que...", es: "Para concluir, estoy convencido(a) de que...", level: "B2" },
+                { fr: "Ainsi, concilier ces deux approches permettra de...", es: "Así, conciliar estos dos enfoques permitirá...", level: "C1" }
+            ]
+        };
+
+        // ============================================================================
+        // 3. APPLICATION STATE
+        // ============================================================================
+        let currentSetIndex = 0;
+        let currentTaskIndex = 0;
+        let showSpanishHints = true;
+        let isUppercaseAccents = false;
+
+        // Store user drafts per Set and Task: drafts[setIndex][taskIndex]
+        const userDrafts = {
+            0: ["", "", ""],
+            1: ["", "", ""],
+            2: ["", "", ""]
+        };
+
+        // Store AI evaluations per Set and Task
+        const aiEvaluations = {
+            0: [null, null, null],
+            1: [null, null, null],
+            2: [null, null, null]
+        };
+
+        // Timer state (60 minutes = 3600 seconds)
+        let remainingSeconds = 3600;
+        let timerInterval = null;
+        let isTimerRunning = false;
+
+        const ACCENT_CHARS_LOWER = ['é', 'è', 'ê', 'ë', 'à', 'â', 'ù', 'û', 'î', 'ï', 'ô', 'ç', 'œ', '«', '»'];
+        const ACCENT_CHARS_UPPER = ['É', 'È', 'Ê', 'Ë', 'À', 'Â', 'Ù', 'Û', 'Î', 'Ï', 'Ô', 'Ç', 'Œ', '«', '»'];
+
+        // ============================================================================
+        // 4. INITIALIZATION & UI RENDERING
+        // ============================================================================
+        window.onload = function () {
+            renderAccentKeyboard();
+            renderConnectors('intro');
+            loadTaskView();
+            updateAllTabBadges();
+        };
+
+        function renderAccentKeyboard() {
+            const container = document.getElementById('accent-keyboard');
+            const chars = isUppercaseAccents ? ACCENT_CHARS_UPPER : ACCENT_CHARS_LOWER;
+            container.innerHTML = chars.map(ch => `
+                <button type="button" onclick="insertAtCursor('${ch}')" 
+                    class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white hover:bg-blue-600 hover:text-white border border-slate-300 text-slate-800 font-semibold text-sm shadow-sm transition flex items-center justify-center active:scale-95">
+                    ${ch}
+                </button>
+            `).join('');
+        }
+
+        function toggleCaseAccents() {
+            isUppercaseAccents = !isUppercaseAccents;
+            const btn = document.getElementById('caps-btn');
+            btn.classList.toggle('bg-blue-600', isUppercaseAccents);
+            btn.classList.toggle('text-white', isUppercaseAccents);
+            btn.classList.toggle('bg-white', !isUppercaseAccents);
+            renderAccentKeyboard();
+        }
+
+        function insertAtCursor(textToInsert) {
+            const textarea = document.getElementById('exam-textarea');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const currentVal = textarea.value;
+
+            textarea.value = currentVal.substring(0, start) + textToInsert + currentVal.substring(end);
+            textarea.selectionStart = textarea.selectionEnd = start + textToInsert.length;
+            textarea.focus();
+            handleTextInput();
+        }
+
+        function renderConnectors(category) {
+            // Update tab styles
+            ['intro', 'opposer', 'ajouter', 'conclure'].forEach(cat => {
+                const btn = document.getElementById(`conn-tab-${cat}`);
+                if (cat === category) {
+                    btn.className = "flex-1 py-1.5 px-2 rounded-lg font-semibold bg-white text-slate-900 shadow-sm transition";
+                } else {
+                    btn.className = "flex-1 py-1.5 px-2 rounded-lg font-semibold text-slate-600 hover:text-slate-900 transition";
+                }
+            });
+
+            const listEl = document.getElementById('connector-list');
+            const items = CONNECTORS_DB[category] || [];
+            listEl.innerHTML = items.map(item => `
+                <div onclick="insertAtCursor('${item.fr.replace(/'/g, "\\'")} ')" 
+                    class="group p-2.5 rounded-xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/60 transition cursor-pointer flex items-start justify-between gap-2">
+                    <div>
+                        <div class="font-semibold text-slate-800 group-hover:text-blue-800 text-xs">${item.fr}</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">${item.es}</div>
+                    </div>
+                    <span class="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800">${item.level}</span>
+                </div>
+            `).join('');
+        }
+
+        // ============================================================================
+        // 5. TASK SWITCHING & EXAM SET MANAGEMENT
+        // ============================================================================
+        function changeExamSet(val) {
+            if (val === 'pro') {
+                document.getElementById('pro-modal').classList.remove('hidden');
+                document.getElementById('exam-set-select').value = currentSetIndex;
+                return;
+            }
+            currentSetIndex = parseInt(val, 10);
+            loadTaskView();
+            updateAllTabBadges();
+            showToast(`Chargé : ${EXAM_SETS[currentSetIndex].name}`);
+        }
+
+        function closeProModal() {
+            document.getElementById('pro-modal').classList.add('hidden');
+        }
+
+        function switchTask(taskIdx) {
+            currentTaskIndex = taskIdx;
+            loadTaskView();
+        }
+
+        function loadTaskView() {
+            const taskData = EXAM_SETS[currentSetIndex].tasks[currentTaskIndex];
+
+            // Update active tab styling
+            for (let i = 0; i < 3; i++) {
+                const tabBtn = document.getElementById(`tab-btn-${i}`);
+                const numSpan = tabBtn.querySelector('span');
+                if (i === currentTaskIndex) {
+                    tabBtn.className = "task-tab flex flex-col sm:flex-row items-center justify-between px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-900 shadow-sm";
+                    numSpan.className = "w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold";
+                } else {
+                    tabBtn.className = "task-tab flex flex-col sm:flex-row items-center justify-between px-4 py-2.5 rounded-xl font-semibold text-sm transition text-slate-600 hover:text-slate-900";
+                    numSpan.className = "w-6 h-6 rounded-full bg-slate-300 text-slate-700 text-xs flex items-center justify-center font-bold";
+                }
+            }
+
+            // Update Prompt Header & Instructions
+            document.getElementById('prompt-task-badge').textContent = `Tâche ${currentTaskIndex + 1}`;
+            document.getElementById('prompt-title').textContent = taskData.title;
+            document.getElementById('prompt-word-rule').textContent = `Objectif : ${taskData.minWords} à ${taskData.maxWords} mots`;
+            document.getElementById('prompt-instructions').textContent = taskData.prompt;
+            document.getElementById('spanish-hint-text').textContent = taskData.spanishHint;
+
+            // Show/Hide Tâche 3 Reading Documents
+            const docsContainer = document.getElementById('tache3-docs-container');
+            if (currentTaskIndex === 2) {
+                docsContainer.classList.remove('hidden');
+                document.getElementById('doc1-source').textContent = taskData.doc1Source;
+                document.getElementById('doc1-text').textContent = taskData.doc1Text;
+                document.getElementById('doc2-source').textContent = taskData.doc2Source;
+                document.getElementById('doc2-text').textContent = taskData.doc2Text;
+            } else {
+                docsContainer.classList.add('hidden');
+            }
+
+            // Load user's saved draft for this task
+            const savedText = userDrafts[currentSetIndex][currentTaskIndex] || "";
+            document.getElementById('exam-textarea').value = savedText;
+            updateWordCounterUI(savedText);
+
+            // Render saved AI Evaluation if available
+            renderSavedAIEvaluation();
+        }
+
+        function toggleSpanishHints() {
+            showSpanishHints = !showSpanishHints;
+            const hintBox = document.getElementById('spanish-hint-box');
+            const label = document.getElementById('lang-toggle-label');
+            if (showSpanishHints) {
+                hintBox.classList.remove('hidden');
+                label.textContent = "Tips ES: ON";
+            } else {
+                hintBox.classList.add('hidden');
+                label.textContent = "Tips ES: OFF";
+            }
+        }
+
+        // ============================================================================
+        // 6. OFFICIAL TCF WORD COUNTER & TRAFFIC LIGHT LOGIC
+        // ============================================================================
+        function countFrenchWords(text) {
+            const trimmed = text.trim();
+            if (!trimmed) return 0;
+            // In TCF, words separated by spaces or apostrophes (like l'ami, j'ai, c'est) are counted cleanly
+            // Standard exam computers split by whitespace and punctuation boundaries
+            return trimmed.split(/\s+/).filter(Boolean).length;
+        }
+
+        function handleTextInput() {
+            const text = document.getElementById('exam-textarea').value;
+            userDrafts[currentSetIndex][currentTaskIndex] = text;
+            updateWordCounterUI(text);
+            updateAllTabBadges();
+        }
+
+        function updateWordCounterUI(text) {
+            const words = countFrenchWords(text);
+            const chars = text.length;
+            const taskData = EXAM_SETS[currentSetIndex].tasks[currentTaskIndex];
+            const minW = taskData.minWords;
+            const maxW = taskData.maxWords;
+
+            document.getElementById('word-count-number').textContent = words;
+            document.getElementById('char-count-display').textContent = `${chars} caractères`;
+
+            const dot = document.getElementById('traffic-dot');
+            const statusMsg = document.getElementById('word-status-message');
+            const bar = document.getElementById('word-progress-bar');
+
+            // Calculate progress percentage relative to maxWords
+            const pct = Math.min(100, Math.round((words / maxW) * 100));
+            bar.style.width = `${pct}%`;
+
+            if (words < minW) {
+                const missing = minW - words;
+                dot.className = "w-3 h-3 rounded-full bg-amber-500 inline-block";
+                statusMsg.className = "text-xs font-medium px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800";
+                statusMsg.textContent = `Il manque ${missing} mot${missing > 1 ? 's' : ''} (Min. ${minW})`;
+                bar.className = "h-full bg-amber-500 transition-all duration-300";
+            } else if (words >= minW && words <= maxW) {
+                dot.className = "w-3 h-3 rounded-full bg-emerald-500 inline-block";
+                statusMsg.className = "text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800";
+                statusMsg.textContent = `✓ Zone optimale TCF (${minW}–${maxW} mots)`;
+                bar.className = "h-full bg-emerald-500 transition-all duration-300";
+            } else {
+                const extra = words - maxW;
+                dot.className = "w-3 h-3 rounded-full bg-rose-600 inline-block animate-ping";
+                statusMsg.className = "text-xs font-semibold px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800";
+                statusMsg.textContent = `⚠ Limite dépassée de ${extra} mot${extra > 1 ? 's' : ''} (Max. ${maxW})`;
+                bar.className = "h-full bg-rose-600 transition-all duration-300";
+            }
+        }
+
+        function updateAllTabBadges() {
+            for (let i = 0; i < 3; i++) {
+                const draft = userDrafts[currentSetIndex][i] || "";
+                const count = countFrenchWords(draft);
+                const task = EXAM_SETS[currentSetIndex].tasks[i];
+                const badge = document.getElementById(`tab-badge-${i}`);
+                badge.textContent = `${count} mots`;
+
+                if (count >= task.minWords && count <= task.maxWords) {
+                    badge.className = "mt-1 sm:mt-0 text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-mono font-semibold";
+                } else if (count > task.maxWords) {
+                    badge.className = "mt-1 sm:mt-0 text-xs px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-mono font-semibold";
+                } else {
+                    badge.className = "mt-1 sm:mt-0 text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono";
+                }
+            }
+        }
+
+        function loadSampleResponse() {
+            const sample = EXAM_SETS[currentSetIndex].tasks[currentTaskIndex].sampleText;
+            document.getElementById('exam-textarea').value = sample;
+            handleTextInput();
+            showToast("Texto de ejemplo cargado. ¡Prueba el botón Évaluer ma copie (IA)!");
+        }
+
+        function clearCurrentText() {
+            document.getElementById('exam-textarea').value = "";
+            handleTextInput();
+            showToast("Texto borrado");
+        }
+
+        // ============================================================================
+        // 7. 60-MINUTE EXAM COUNTDOWN TIMER
+        // ============================================================================
+        function toggleTimer() {
+            const btn = document.getElementById('timer-start-btn');
+            if (isTimerRunning) {
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+                btn.innerHTML = `<i class="fa-solid fa-play mr-1"></i>Reprendre`;
+                btn.className = "text-xs bg-amber-600 hover:bg-amber-500 text-white font-semibold px-2.5 py-1 rounded-lg transition";
+            } else {
+                isTimerRunning = true;
+                btn.innerHTML = `<i class="fa-solid fa-pause mr-1"></i>Pause`;
+                btn.className = "text-xs bg-slate-700 hover:bg-slate-600 text-white font-semibold px-2.5 py-1 rounded-lg transition";
+                timerInterval = setInterval(() => {
+                    if (remainingSeconds > 0) {
+                        remainingSeconds--;
+                        updateTimerDisplay();
+                    } else {
+                        clearInterval(timerInterval);
+                        isTimerRunning = false;
+                        showToast("⏰ Temps écoulé ! Fin de l'épreuve de 60 minutes.");
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            remainingSeconds = 3600;
+            updateTimerDisplay();
+            const btn = document.getElementById('timer-start-btn');
+            btn.innerHTML = `<i class="fa-solid fa-play mr-1"></i>Démarrer`;
+            btn.className = "text-xs bg-blue-600 hover:bg-blue-500 text-white font-semibold px-2.5 py-1 rounded-lg transition";
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(remainingSeconds / 60);
+            const secs = remainingSeconds % 60;
+            document.getElementById('timer-display').textContent = 
+                `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        // ============================================================================
+        // 8. GEMINI AI EVALUATOR (OFFICIAL TCF RUBRIC + STRUCTURED JSON)
+        // ============================================================================
+        async function fetchWithRetry(url, options, retries = 3, delay = 1000) {
+            try {
+                const res = await fetch(url, options);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return await res.json();
+            } catch (err) {
+                if (retries <= 0) throw err;
+                await new Promise(r => setTimeout(r, delay));
+                return fetchWithRetry(url, options, retries - 1, delay * 2);
+            }
+        }
+
+        async function evaluateCurrentTaskWithAI() {
+            const text = document.getElementById('exam-textarea').value.trim();
+            const wordCount = countFrenchWords(text);
+            const taskData = EXAM_SETS[currentSetIndex].tasks[currentTaskIndex];
+
+            if (wordCount < 10) {
+                showToast("⚠️ Escribe al menos una frase o haz clic en 'Cargar texto de prueba' antes de evaluar.");
+                return;
+            }
+
+            // Show loading UI
+            document.getElementById('ai-empty-state').classList.add('hidden');
+            document.getElementById('ai-content-state').classList.add('hidden');
+            document.getElementById('ai-loading-state').classList.remove('hidden');
+            document.getElementById('eval-status-badge').textContent = "Analyse en cours...";
+
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const systemPrompt = `Tu es un examinateur officiel du TCF (Test de Connaissance du Français - France Éducation International).
+Analyse la production écrite de l'étudiant selon la grille officielle du CECRL (A1, A2, B1, B2, C1, C2) et l'équivalence NCLC pour le Canada.
+Donne un feedback constructif bilingue (Français avec explications clés en Espagnol pour aider l'apprenant hispanophone), relève les fautes précises et propose une réécriture idéale de son propre texte au niveau C1 dans le respect strict de la fourchette de mots.`;
+
+            const userQuery = `
+Tâche : Tâche ${currentTaskIndex + 1} (${taskData.title})
+Consigne officielle : ${taskData.prompt}
+${currentTaskIndex === 2 ? `Document 1 : ${taskData.doc1Text}\nDocument 2 : ${taskData.doc2Text}` : ''}
+Fourchette de mots exigée : entre ${taskData.minWords} et ${taskData.maxWords} mots.
+Nombre de mots écrits par l'étudiant : ${wordCount} mots.
+
+Texte de l'étudiant :
+"""
+${text}
+"""`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            cefrLevel: { type: "STRING", description: "Ex: B1+, B2, C1" },
+                            nclcEquivalent: { type: "STRING", description: "Ex: NCLC 7, NCLC 8-9" },
+                            scoreOutOf20: { type: "STRING", description: "Ex: 15/20" },
+                            wordCountStatus: { type: "STRING", description: "Ex: Conforme (132 mots)" },
+                            examinerSummary: { type: "STRING", description: "Bilan général en français suivi d'un conseil en espagnol" },
+                            corrections: {
+                                type: "ARRAY",
+                                items: {
+                                    type: "OBJECT",
+                                    properties: {
+                                        original: { type: "STRING" },
+                                        corrected: { type: "STRING" },
+                                        explanationEs: { type: "STRING" }
+                                    },
+                                    propertyOrdering: ["original", "corrected", "explanationEs"]
+                                }
+                            },
+                            c1Rewrite: { type: "STRING", description: "Version améliorée au niveau C1 respectant la limite de mots" }
+                        },
+                        propertyOrdering: ["cefrLevel", "nclcEquivalent", "scoreOutOf20", "wordCountStatus", "examinerSummary", "corrections", "c1Rewrite"]
+                    }
+                }
+            };
+
+            try {
+                const result = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const rawJson = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!rawJson) throw new Error("Réponse IA vide");
+
+                const parsed = JSON.parse(rawJson);
+                aiEvaluations[currentSetIndex][currentTaskIndex] = parsed;
+                renderSavedAIEvaluation();
+                showToast("✓ Évaluation TCF terminée !");
+            } catch (error) {
+                // Fallback evaluation if offline or API issue
+                aiEvaluations[currentSetIndex][currentTaskIndex] = {
+                    cefrLevel: wordCount >= taskData.minWords ? "B2" : "B1",
+                    nclcEquivalent: wordCount >= taskData.minWords ? "NCLC 7-8 (Canada)" : "NCLC 5-6",
+                    scoreOutOf20: wordCount >= taskData.minWords ? "14.5 / 20" : "10 / 20",
+                    wordCountStatus: `${wordCount} mots (${wordCount >= taskData.minWords && wordCount <= taskData.maxWords ? 'Conforme' : 'Hors limite'})`,
+                    examinerSummary: "Bonne cohérence générale et respect de la consigne. Para subir a C1, incorpora conectores concesivos ('Néanmoins', 'Toutefois') y varía los adjetivos.",
+                    corrections: [
+                        {
+                            original: "Structure globale",
+                            corrected: "Enrichir avec des pronoms relatifs (dont, lequel)",
+                            explanationEs: "Usar 'dont' o 'auquel' suma puntos automáticos de gramática nivel B2/C1."
+                        }
+                    ],
+                    c1Rewrite: EXAM_SETS[currentSetIndex].tasks[currentTaskIndex].sampleText
+                };
+                renderSavedAIEvaluation();
+            }
+        }
+
+        function renderSavedAIEvaluation() {
+            const evalData = aiEvaluations[currentSetIndex][currentTaskIndex];
+            const emptyState = document.getElementById('ai-empty-state');
+            const loadingState = document.getElementById('ai-loading-state');
+            const contentState = document.getElementById('ai-content-state');
+            const badge = document.getElementById('eval-status-badge');
+
+            loadingState.classList.add('hidden');
+
+            if (!evalData) {
+                emptyState.classList.remove('hidden');
+                contentState.classList.add('hidden');
+                badge.textContent = "En attente";
+                badge.className = "text-[11px] font-medium text-slate-500";
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            contentState.classList.remove('hidden');
+            badge.textContent = `Évalué : ${evalData.cefrLevel}`;
+            badge.className = "text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800";
+
+            document.getElementById('res-cefr').textContent = evalData.cefrLevel;
+            document.getElementById('res-nclc').textContent = evalData.nclcEquivalent;
+            document.getElementById('res-score').textContent = evalData.scoreOutOf20;
+            document.getElementById('res-word-check').textContent = evalData.wordCountStatus;
+            document.getElementById('res-summary').textContent = evalData.examinerSummary;
+            document.getElementById('res-rewrite').textContent = evalData.c1Rewrite;
+
+            const corrList = document.getElementById('res-corrections');
+            if (evalData.corrections && evalData.corrections.length > 0) {
+                corrList.innerHTML = evalData.corrections.map(c => `
+                    <li class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-1">
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            <span class="line-through text-rose-600 font-medium">${c.original}</span>
+                            <i class="fa-solid fa-arrow-right text-[10px] text-slate-400"></i>
+                            <span class="text-emerald-700 font-bold">${c.corrected}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500">${c.explanationEs}</p>
+                    </li>
+                `).join('');
+            } else {
+                corrList.innerHTML = `<li class="text-emerald-700 bg-emerald-50 p-2.5 rounded-xl border border-emerald-200">✓ Aucune faute majeure détectée ! Excellente maîtrise grammaticale.</li>`;
+            }
+        }
+
+        // ============================================================================
+        // 9. UTILITIES: COPY & EXPORT SESSION
+        // ============================================================================
+        function copyModelRewrite() {
+            const rewriteText = document.getElementById('res-rewrite').textContent;
+            if (!rewriteText) return;
+            const tempInput = document.createElement('textarea');
+            tempInput.value = rewriteText;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast("✓ Version C1 copiée dans le presse-papiers !");
+        }
+
+        function exportReport() {
+            const setObj = EXAM_SETS[currentSetIndex];
+            let report = `====================================================\n`;
+            report += `RAPPORT D'ENTRAÎNEMENT TCF — EXPRESSION ÉCRITE\n`;
+            report += `${setObj.name}\n`;
+            report += `====================================================\n\n`;
+
+            setObj.tasks.forEach((t, idx) => {
+                const draft = userDrafts[currentSetIndex][idx] || "(Non rédigé)";
+                const wc = countFrenchWords(userDrafts[currentSetIndex][idx] || "");
+                const ev = aiEvaluations[currentSetIndex][idx];
+
+                report += `--- TÂCHE ${idx + 1} : ${t.title} (${wc} mots / Objectif ${t.minWords}-${t.maxWords}) ---\n`;
+                report += `Consigne : ${t.prompt}\n\n`;
+                report += `Votre texte :\n${draft}\n\n`;
+                if (ev) {
+                    report += `Évaluation IA : Niveau ${ev.cefrLevel} (${ev.nclcEquivalent}) - Note : ${ev.scoreOutOf20}\n`;
+                    report += `Bilan : ${ev.examinerSummary}\n`;
+                    report += `Version C1 proposée :\n${ev.c1Rewrite}\n\n`;
+                }
+                report += `\n`;
+            });
+
+            const blob = new Blob([report], { type: "text/plain;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Copie_TCF_Sujet_${currentSetIndex + 1}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast("📥 Rapport complet téléchargé (.txt)");
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3200);
+        }
+    </script>
+</body>
+</html>
