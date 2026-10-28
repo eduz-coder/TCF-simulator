@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrussAudit Pro — Zero-Server Edition</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome / Lucide Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- PDF.js (Local PDF Reading in RAM) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- pdf-lib (Vectorial Export of 2-Page Marked PDF +600pt & Tables) -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 7px; height: 7px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- MAIN HEADER -->
+    <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40 shadow-md">
+        <div class="max-w-[1600px] mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            <!-- Brand & Zero-Server Badge -->
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-lg shadow border border-blue-400/30">
+                    <i class="fa-solid fa-compass-drafting"></i>
+                </div>
+                <div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <h1 class="font-extrabold text-base sm:text-lg tracking-tight">TrussAudit Pro — Zero-Server Edition</h1>
+                        <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[11px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                            🔒 100% Client-Side RAM Processing (Zero-Server)
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-400 font-mono" id="header-standards-summary">
+                        White-Label QC | Floor: L/600 | Found. Clr: 1/2" (Rule 10) | Seat Cut: 3" (Rule 8) | Stock: HUS26, HUS28, HUS26-2, HUS28-2
+                    </p>
+                </div>
+            </div>
+
+            <!-- Mode Switcher & Plant Settings Button -->
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="bg-slate-800 p-1 rounded-xl border border-slate-700 flex items-center text-xs font-bold">
+                    <button id="btn-mode-quote" onclick="switchAuditMode('quote')" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                        QUOTE MODE (Preliminary)
+                    </button>
+                    <button id="btn-mode-order" onclick="switchAuditMode('order')" class="px-3 py-1.5 rounded-lg bg-blue-600 text-white shadow transition flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-rose-300"></span>
+                        ORDER MODE (Production)
+                    </button>
+                </div>
+
+                <button onclick="toggleStandardsModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 text-xs font-semibold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5">
+                    <span>⚙️ Plant Standards</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT: LEFT SIDEBAR (3 STEPS) + RIGHT WORKSPACE (3 TABS) -->
+    <main class="flex-1 max-w-[1600px] w-full mx-auto px-4 py-4 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+        <!-- LEFT SIDEBAR: 3-STEP WORKFLOW -->
+        <aside class="lg:col-span-4 xl:col-span-3 space-y-4">
+
+            <!-- STEP 1: PROJECT FILES OR 1-CLICK DEMO -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-extrabold uppercase tracking-wider text-blue-600">Step 1: Project Files</span>
+                    <span class="text-[11px] font-mono text-slate-400" id="scanned-pages-pill">48 pages ready</span>
+                </div>
+
+                <!-- 1-Click Demo Button -->
+                <button onclick="loadCompleteDemoProject()" class="w-full bg-amber-500/15 hover:bg-amber-500/25 text-amber-900 border border-amber-400/60 font-bold text-xs px-3 py-2.5 rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
+                    <span>⚡ Load Complete Demo Project (1-Click Test)</span>
+                </button>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1">Project Name / Reference:</label>
+                    <input type="text" id="project-name-input" value="Oakridge Residential #26410-R" oninput="drawInteractiveCanvas()" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-mono font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600">
+                </div>
+
+                <!-- 3 PDF Upload Slots -->
+                <div class="space-y-2 text-xs">
+                    <!-- Slot 1 -->
+                    <div class="p-2.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between gap-2">
+                        <div class="min-w-0">
+                            <div class="font-bold text-slate-800 truncate">1. Architecture & Structure Plans</div>
+                            <div class="text-[11px] font-mono text-emerald-700 truncate" id="label-pdf-plans">Demo: Plans_A1-A6_S1-S3.pdf (18 pages)</div>
+                        </div>
+                        <label class="shrink-0 cursor-pointer bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg shadow-sm">
+                            Upload PDF
+                            <input type="file" accept=".pdf" class="hidden" onchange="handleLocalPdfUpload(event, 'plans')">
+                        </label>
+                    </div>
+
+                    <!-- Slot 2 -->
+                    <div class="p-2.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between gap-2">
+                        <div class="min-w-0">
+                            <div class="font-bold text-slate-800 truncate">2. MiTek Layout (Roof / Floor)</div>
+                            <div class="text-[11px] font-mono text-emerald-700 truncate" id="label-pdf-layout">Demo: MiTek_Layout_Original.pdf (2 pages)</div>
+                        </div>
+                        <label class="shrink-0 cursor-pointer bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg shadow-sm">
+                            Upload PDF
+                            <input type="file" accept=".pdf" class="hidden" onchange="handleLocalPdfUpload(event, 'layout')">
+                        </label>
+                    </div>
+
+                    <!-- Slot 3 -->
+                    <div class="p-2.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between gap-2">
+                        <div class="min-w-0">
+                            <div class="font-bold text-slate-800 truncate">3. MiTek Profiles (1 page/truss)</div>
+                            <div class="text-[11px] font-mono text-emerald-700 truncate" id="label-pdf-profiles">Demo: Profiles_EDD_28_Trusses.pdf (28 pages)</div>
+                        </div>
+                        <label class="shrink-0 cursor-pointer bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg shadow-sm">
+                            Upload PDF
+                            <input type="file" accept=".pdf" class="hidden" onchange="handleLocalPdfUpload(event, 'profiles')">
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 2: VISUAL HEADER ANONYMIZER (PRIVACY MODE) -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-700">Step 2: 🔒 Visual Header Anonymizer</span>
+                    <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Privacy Mode</span>
+                </div>
+                <p class="text-[11px] text-slate-500 leading-relaxed">
+                    Hide builder names, client details, or project addresses locally before auditing or exporting.
+                </p>
+
+                <div class="space-y-2 text-xs">
+                    <label class="flex items-center gap-2.5 cursor-pointer font-semibold text-slate-800">
+                        <input type="checkbox" id="chk-redact-titleblock" checked onchange="drawInteractiveCanvas()" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4">
+                        <span>Hide Right / Bottom Title Block</span>
+                    </label>
+
+                    <label class="flex items-center gap-2.5 cursor-pointer font-semibold text-slate-800">
+                        <input type="checkbox" id="chk-redact-header" checked onchange="drawInteractiveCanvas()" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4">
+                        <span>Hide Client / Address Header</span>
+                    </label>
+
+                    <label class="flex items-center gap-2.5 cursor-pointer font-semibold text-slate-800">
+                        <input type="checkbox" id="chk-draw-redaction" onchange="updateCanvasCursor()" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4">
+                        <span>Draw black redaction boxes with mouse on layout</span>
+                    </label>
+                </div>
+
+                <div class="pt-1 flex items-center justify-between">
+                    <span class="text-[11px] font-mono text-slate-400" id="custom-redactions-count">0 manual boxes</span>
+                    <button onclick="clearManualRedactions()" class="text-[11px] font-semibold text-rose-600 hover:text-rose-800 underline">
+                        Clear manual boxes
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 3: RUN AUDIT & EXPORT -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3">
+                <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-600 block">Step 3: Audit & Export</span>
+
+                <button onclick="runFourPhaseAudit()" id="btn-run-qc" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                    <span>🚀 Run 4-Phase QC Audit + Generate Markup</span>
+                </button>
+
+                <!-- Phase Status Bar -->
+                <div id="phase-status-box" class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-1.5 text-[11px]">
+                    <div class="flex items-center justify-between font-bold text-slate-700">
+                        <span id="phase-status-text">✓ 4 Phases Completed (9 Findings)</span>
+                        <span class="font-mono text-emerald-600" id="phase-mode-badge">ORDER MODE</span>
+                    </div>
+                    <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                        <div id="phase-progress-bar" class="bg-emerald-500 h-full w-full transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <!-- PDF Export Button -->
+                <button onclick="downloadRealMarkedPDF()" id="btn-export-pdf" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs py-3.5 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                    <span>📥 Download Revised Layout PDF (+600pt & Tables)</span>
+                </button>
+            </div>
+
+        </aside>
+
+        <!-- RIGHT WORKSPACE (3 TABS) -->
+        <section class="lg:col-span-8 xl:col-span-9 space-y-4">
+
+            <!-- Tab Bar & Verdict Summary -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-3 shadow-sm flex flex-wrap items-center justify-between gap-3">
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <button onclick="switchWorkspaceTab('tab-canvas')" id="tabbtn-canvas" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white shadow-sm transition">
+                        📐 Layout Viewer + Notes Panel (+600pt)
+                    </button>
+                    <button onclick="switchWorkspaceTab('tab-tables')" id="tabbtn-tables" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                        📊 Technical Verification Tables (PDF Page 2)
+                    </button>
+                    <button onclick="switchWorkspaceTab('tab-matrix')" id="tabbtn-matrix" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                        📋 4-Phase Matrix (Quote vs Order) & Sheet Inventory
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-2 text-xs">
+                    <span id="verdict-pill" class="bg-rose-100 text-rose-800 border border-rose-300 font-extrabold px-3 py-1 rounded-full text-[11px]">
+                        🔴 DO NOT RELEASE TO PLANT (8 High Priority)
+                    </span>
+                </div>
+            </div>
+
+            <!-- TAB 1: INTERACTIVE LAYOUT CANVAS + NOTES PANEL (+600PT) -->
+            <div id="workspace-tab-canvas" class="space-y-4">
+                <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span class="font-bold text-slate-900">Interactive Audit Canvas (PDF Page 1):</span>
+                            <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-700"><span class="w-2.5 h-2.5 rounded-full bg-rose-600"></span> Red = High Priority</span>
+                            <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Orange = Medium / Order</span>
+                            <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700"><span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span> Blue = Low Note</span>
+                        </div>
+                        <div class="text-[11px] font-mono text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">
+                            💡 Drag any numbered bubble (1-9) with the mouse to avoid covering dimensions
+                        </div>
+                    </div>
+
+                    <!-- HTML5 Canvas: Left Layout (680px) + Right Panel 600pt (520px) = 1200x620 -->
+                    <div class="bg-slate-900 rounded-xl p-2 border border-slate-800 overflow-x-auto flex justify-center">
+                        <canvas id="audit-main-canvas" width="1200" height="620" class="max-w-full h-auto rounded bg-white shadow cursor-grab"></canvas>
+                    </div>
+                </div>
+
+                <!-- Editable findings list below canvas -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+                        <h3 class="font-bold text-slate-900 text-sm">Findings Breakdown on Marked Layout (Click to Toggle in PDF)</h3>
+                        <span class="text-xs font-mono text-slate-500">Inventory: Reviewed 18 sheets (A1–A6, S0.1–S3.4) + Layout + 28 Profiles</span>
+                    </div>
+                    <div id="findings-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: TECHNICAL VERIFICATION TABLES (PDF PAGE 2) -->
+            <div id="workspace-tab-tables" class="hidden space-y-4">
+                <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-5">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                        <div>
+                            <h2 class="font-extrabold text-slate-900 text-base">Technical Support Tables (Exported PDF Page 2)</h2>
+                            <p class="text-xs text-slate-500">Automated calculations audited against structural plans, Simpson Catalog C-C-2026, and strict internal rule sets.</p>
+                        </div>
+                        <button onclick="downloadRealMarkedPDF()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition">
+                            📥 Download PDF with these Tables
+                        </button>
+                    </div>
+
+                    <!-- Table 1: Girder Loads (Rule 7) -->
+                    <div class="space-y-1.5">
+                        <h4 class="text-xs font-extrabold uppercase tracking-wider text-blue-800">1. Girder Loads in Layout & Mandatory Note >= 14,000 lb (Rule 7)</h4>
+                        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                                    <tr>
+                                        <th class="p-2.5">Girder</th>
+                                        <th class="p-2.5">Support</th>
+                                        <th class="p-2.5">MiTek Load (Max Grav)</th>
+                                        <th class="p-2.5">Layout Load</th>
+                                        <th class="p-2.5">Requires Note >= 14,000#?</th>
+                                        <th class="p-2.5">Status / Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body-girders" class="divide-y divide-slate-100 font-mono text-[11px]"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Table 2: Hangers vs Stock & Seat Cut (Rules 3, 4, 8) -->
+                    <div class="space-y-1.5">
+                        <h4 class="text-xs font-extrabold uppercase tracking-wider text-blue-800">2. Hangers vs. Plant Stock & 3" Minimum Seat Cut (Rules 3, 4, and 8)</h4>
+                        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                                    <tr>
+                                        <th class="p-2.5">Girder / Hanging Truss</th>
+                                        <th class="p-2.5">Max Grav / Uplift</th>
+                                        <th class="p-2.5">MiTek Hanger</th>
+                                        <th class="p-2.5">Capacity (SD / Nails)</th>
+                                        <th class="p-2.5">Profile Seat Cut</th>
+                                        <th class="p-2.5">Verdict / Stock</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body-hangers" class="divide-y divide-slate-100 font-mono text-[11px]"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Table 3: Knee Wall / Attic Trigonometric Check (Rule 9) -->
+                    <div class="space-y-1.5">
+                        <h4 class="text-xs font-extrabold uppercase tracking-wider text-blue-800">3. Trigonometric Knee Wall & Ceiling Verification in Attic Trusses (Rule 9)</h4>
+                        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                                    <tr>
+                                        <th class="p-2.5">Trusses</th>
+                                        <th class="p-2.5">Plan Knee Wall Height</th>
+                                        <th class="p-2.5">Heel Table Used</th>
+                                        <th class="p-2.5">Real Clearance in MiTek</th>
+                                        <th class="p-2.5">Flat Ceiling Width (Plan vs MiTek)</th>
+                                        <th class="p-2.5">Calculated Required Heel</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body-kneewall" class="divide-y divide-slate-100 font-mono text-[11px]"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Table 4: Special Loads / Snow Drift ASCE 7 (Rule 14) -->
+                    <div class="space-y-1.5">
+                        <h4 class="text-xs font-extrabold uppercase tracking-wider text-blue-800">4. Special Loads / Snow Drift ASCE 7-16 Calculation in PSF and PLF (Rule 14)</h4>
+                        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                                    <tr>
+                                        <th class="p-2.5">Affected Truss</th>
+                                        <th class="p-2.5">Distance to High Wall</th>
+                                        <th class="p-2.5">Total Plan Load (psf)</th>
+                                        <th class="p-2.5">MiTek Base Snow</th>
+                                        <th class="p-2.5">Extra Surcharge (psf)</th>
+                                        <th class="p-2.5">Linear Surcharge (plf @ 24" o.c.)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body-drift" class="divide-y divide-slate-100 font-mono text-[11px]"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Table 5: Floor Trusses L/600 & 1/2" Foundation Clearance (Rules 10, 11) -->
+                    <div class="space-y-1.5">
+                        <h4 class="text-xs font-extrabold uppercase tracking-wider text-blue-800">5. Floor Trusses: L/600 Deflection & 1/2" Foundation Clearance (Rules 10 and 11)</h4>
+                        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                                    <tr>
+                                        <th class="p-2.5">Floor Truss</th>
+                                        <th class="p-2.5">Depth / Spacing</th>
+                                        <th class="p-2.5">Chords (TC / BC)</th>
+                                        <th class="p-2.5">Real Vert(LL) vs Standard</th>
+                                        <th class="p-2.5">Raised Support (BL)</th>
+                                        <th class="p-2.5">BC Start vs 8" Wall (+1/2" Clr)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body-floors" class="divide-y divide-slate-100 font-mono text-[11px]"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: 4-PHASE MATRIX (QUOTE VS ORDER) & SHEET INVENTORY -->
+            <div id="workspace-tab-matrix" class="hidden space-y-4">
+                <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-5">
+                    <div>
+                        <h2 class="font-extrabold text-slate-900 text-base">4-Phase Execution Matrix (Quote vs. Order) — 14 Engineering Rules</h2>
+                        <p class="text-xs text-slate-500">In Quote Mode, the agent filters cost-moving items; in Order Mode, it audits every fabrication and field detail.</p>
+                    </div>
+
+                    <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="bg-slate-900 text-white font-bold">
+                                <tr>
+                                    <th class="p-3">Phase / Rule</th>
+                                    <th class="p-3">What the Agent Audits Exactly</th>
+                                    <th class="p-3">QUOTE MODE (Preliminary)</th>
+                                    <th class="p-3">ORDER MODE (Production)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 text-xs">
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">PHASE 1: Rules 13 & 14<br><span class="text-[11px] font-mono text-blue-600">Plans & Loads</span></td>
+                                    <td class="p-3 text-slate-600">Sheet-by-sheet sweep, section callouts (e.g., 6/S3.4), SGT/GT sheathed, holdowns, Snow Drift (ASCE 7), overframing.</td>
+                                    <td class="p-3"><span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded">🔴 High Priority (Moves Cost)</span></td>
+                                    <td class="p-3"><span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded">🔴 High Priority (100% Strict)</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">PHASE 2: Rules 1, 6, 9, 11, 12<br><span class="text-[11px] font-mono text-blue-600">Geometry & L/600 Floor</span></td>
+                                    <td class="p-3 text-slate-600">Compare heels between neighbors (R1), exact eaves (R6), trigonometric knee wall (R9), L/600 deflection (R11), lay-in gables (R12).</td>
+                                    <td class="p-3"><span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded">🔴 High Priority</span></td>
+                                    <td class="p-3"><span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded">🔴 High Priority (Blocks Order)</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">PHASE 2: Rule 10<br><span class="text-[11px] font-mono text-blue-600">1/2" Foundation Clearance</span></td>
+                                    <td class="p-3 text-slate-600">Floor trusses with bearing blocks (BL): bottom chord start must clear interior foundation wall by at least 1/2".</td>
+                                    <td class="p-3"><span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded">🟠 For the Order (Orange notice)</span></td>
+                                    <td class="p-3"><span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded">🔴 High Priority</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">PHASE 3: Rules 3 & 4<br><span class="text-[11px] font-mono text-blue-600">Hanger Capacity & Fit</span></td>
+                                    <td class="p-3 text-slate-600">Reactions vs Stock (SD10212 / Nails), detect Special Orders (HGUS/THGQ), and 9 physical clearance / No Soln checks.</td>
+                                    <td class="p-3"><span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded">🔴 High Priority (Special Orders)</span></td>
+                                    <td class="p-3"><span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded">🔴 High Priority</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">PHASE 3: Rules 7 & 8<br><span class="text-[11px] font-mono text-blue-600">Girders Layout & 3" Seat Cut</span></td>
+                                    <td class="p-3 text-slate-600">Loads written on girder supports, mandatory note >= 14,000 lb (R7), and min. 3" seat cut with HANGER HELD UP note (R8).</td>
+                                    <td class="p-3"><span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded">🟠 For the Order (Orange notice)</span></td>
+                                    <td class="p-3"><span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded">🔴 High Priority</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">PHASE 4: Rule 2 & Package<br><span class="text-[11px] font-mono text-blue-600">Dimensions & Ghosts</span></td>
+                                    <td class="p-3 text-slate-600">Complete layout dimensions (R2), attic stairwell openings, and detection of ghost profiles (e.g. duplicate R1001).</td>
+                                    <td class="p-3"><span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded">🟠 For the Order (R1001 warned)</span></td>
+                                    <td class="p-3"><span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded">🔴 High Priority</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Sheet Inventory (Rule 13) -->
+                    <div class="bg-slate-50 rounded-xl border border-slate-200 p-4 space-y-2">
+                        <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">📋 Audited Sheet Inventory (Rule 13 — Sheet-by-Sheet Sweep)</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 text-xs font-mono">
+                            <div class="bg-white p-2.5 rounded-lg border border-slate-200"><strong>A1.0 – A2.2:</strong> Floor 1 Plan, Floor 2 (Attic Knee Wall 5'-0") & Stairwell (11'-4").</div>
+                            <div class="bg-white p-2.5 rounded-lg border border-slate-200"><strong>A3.1 – A4.2:</strong> Elevations & Sections (Knee Wall Clg 5'-6 1/8", Flat Clg 8'-1 1/8", Eaves 1'-4 3/4").</div>
+                            <div class="bg-white p-2.5 rounded-lg border border-slate-200"><strong>S0.1 – S1.2:</strong> General Notes, Loads (Pg=35, Pf=30), 8" Concrete Foundation.</div>
+                            <div class="bg-white p-2.5 rounded-lg border border-slate-200"><strong>S1.3 (Roof Framing):</strong> SGT-A over WSW-E, Snow Drift Zone (56 psf -> 25.2 psf), Overframing.</div>
+                            <div class="bg-white p-2.5 rounded-lg border border-slate-200"><strong>S3.1 & Section 6/S3.4:</strong> Gable Truss Schedule (OSB 7/16", Verticals @ 24" o.c., 2x H2.5A).</div>
+                            <div class="bg-white p-2.5 rounded-lg border border-slate-200"><strong>MiTek Package:</strong> Roof/Floor Layout (2 pages) + 28 EDD Profiles (T01–T20, GR01–GR02, LG01, F01–F04, R1001).</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- MODAL: ⚙️ PLANT STANDARDS (WHITE-LABEL) -->
+    <div id="standards-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="font-extrabold text-slate-900 text-base">⚙️ Plant Standards Configuration (White-Label)</h3>
+                <button onclick="toggleStandardsModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold">✕</button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1">Plant / Company Name (Appears in PDF Header):</label>
+                    <input type="text" id="cfg-plant-name" value="TRUSSAUDIT PRO — QUALITY CONTROL & ENGINEERING" class="w-full border border-slate-300 rounded-xl px-3 py-2 font-mono">
+                </div>
+
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1">Standard Stock Hangers (Rule 3):</label>
+                    <input type="text" id="cfg-stock-hangers" value="HUS26, HUS28, HUS26-2, HUS28-2" class="w-full border border-slate-300 rounded-xl px-3 py-2 font-mono">
+                </div>
+
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1">Floor Deflection Standard (Rule 11):</label>
+                    <select id="cfg-defl-limit" class="w-full border border-slate-300 rounded-xl px-2.5 py-2 font-mono">
+                        <option value="L/600" selected>L/600 (Strict Standard)</option>
+                        <option value="L/480">L/480</option>
+                        <option value="L/720">L/720 (Stone / Tile)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1">Optional API Key (BYOK — Anthropic / Gemini for Live Extraction):</label>
+                    <input type="password" id="cfg-api-key" placeholder="Optional (Everything runs locally in browser RAM)" class="w-full border border-slate-300 rounded-xl px-3 py-2 font-mono">
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex justify-end gap-2">
+                <button onclick="savePlantConfig()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition">
+                    Save and Update Markup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast-box" class="fixed bottom-4 right-4 z-50 hidden bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-xl border border-slate-700">
+        <span id="toast-text">Ready</span>
+    </div>
+
+    <script>
+        if (window.pdfjsLib) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+
+        // Global Configuration & Internal Rules (Rule 10 = 1/2" Found. Clr, Rule 8 = 3" Min Seat Cut)
+        let currentMode = 'order'; // 'quote' | 'order'
+        let plantSettings = {
+            plantName: "TRUSSAUDIT PRO — QUALITY CONTROL & ENGINEERING",
+            stockHangers: "HUS26, HUS28, HUS26-2, HUS28-2",
+            deflLimit: "L/600"
+        };
+        const INTERNAL_RULES = {
+            foundationClearance: '1/2"',
+            minSeatCut: '3"'
+        };
+
+        // Uploaded files & state
+        let uploadedLayoutBuffer = null;
+        let uploadedLayoutImage = null;
+
+        let manualBlackBoxes = []; // [{x, y, w, h}]
+        let draggingCalloutId = null;
+        let isDrawingBlackBox = false;
+        let blackBoxStart = { x: 0, y: 0 };
+
+        // Findings list with coordinates on left layout (0..680px)
+        let findings = [];
+
+        function initDefaultFindings() {
+            const orderPrio = currentMode === 'quote' ? 'media' : 'alta';
+            findings = [
+                {
+                    id: 1,
+                    rule: "Rule 13 (SGT-A at Shear Wall)",
+                    prio: "alta",
+                    ref: "Sheet S1.3 & 6/S3.4",
+                    shortText: "Plans call for SGT-A sheathed (7/16\" OSB + verticals @ 24\" + 2 H2.5A). Layout modeled standard T10 common.",
+                    action: "Change truss to SGT-A per Gable Truss Schedule.",
+                    x: 92, y: 260,
+                    targetX: 68, targetY: 295,
+                    cloud: { x: 48, y: 170, w: 42, h: 250 },
+                    active: true
+                },
+                {
+                    id: 2,
+                    rule: "Rule 14 (Snow Drift ASCE 7-16)",
+                    prio: "alta",
+                    ref: "S1.3 vs T09-T12",
+                    shortText: "Missing Snow Drift at high wall: 56.0 psf dropping to 25.2 psf over 7'-0\". MiTek only has 30 psf (+52 plf extra).",
+                    action: "Run trapezoidal/uniform surcharge on T09-T12.",
+                    x: 345, y: 120,
+                    targetX: 315, targetY: 165,
+                    cloud: { x: 278, y: 110, w: 115, h: 175 },
+                    active: true
+                },
+                {
+                    id: 3,
+                    rule: "Rule 9 (Attic Knee Wall vs Heel)",
+                    prio: "alta",
+                    ref: "A3.1 vs T01-T08",
+                    shortText: "With 12\" table heel, knee wall clearance is only 3'-7\" (plans require 5'-6 1/8\" clear and 7'-6\" flat ceiling).",
+                    action: "Increase heel to 2'-11\" in T01-T08 or verify with client.",
+                    x: 195, y: 125,
+                    targetX: 165, targetY: 185,
+                    cloud: { x: 98, y: 135, w: 155, h: 135 },
+                    active: true
+                },
+                {
+                    id: 4,
+                    rule: `Rule 11 (Floor Deflection ${plantSettings.deflLimit})`,
+                    prio: "alta",
+                    ref: "Floor Trusses F02 & F04",
+                    shortText: `F02 gives Vert(LL) = L/515 (-0.55\") and F04 gives L/524. MiTek ran with L/360; fails ${plantSettings.deflLimit} standard.`,
+                    action: `Switch deflection criterion to ${plantSettings.deflLimit} and upgrade chords to 2100F.`,
+                    x: 520, y: 205,
+                    targetX: 485, targetY: 255,
+                    cloud: { x: 435, y: 195, w: 145, h: 130 },
+                    active: true
+                },
+                {
+                    id: 5,
+                    rule: "Rule 12 (Lay-in Gable Height)",
+                    prio: "alta",
+                    ref: "Profile LG01 vs T05",
+                    shortText: "Lay-in gable LG01 height is 9'-2 1/4\", exceeding the highest main truss (T05 = 8'-11 5/8\") by 2-5/8\".",
+                    action: "Lower or split LG01 in MiTek.",
+                    x: 295, y: 475,
+                    targetX: 265, targetY: 445,
+                    cloud: { x: 185, y: 415, w: 160, h: 80 },
+                    active: true
+                },
+                {
+                    id: 6,
+                    rule: "Rule 7 (Girder Reaction >= 14,000#)",
+                    prio: orderPrio,
+                    ref: "Left Support GR02",
+                    shortText: "GR02 carries 14,280 lb at left support. Missing reaction written on layout and mandatory col. >=14,000# note.",
+                    action: 'Write "14,280#" + note "COLUMN TO SUPPORT 14,280# DIRECTLY UNDER BEARING".',
+                    x: 175, y: 365,
+                    targetX: 195, targetY: 325,
+                    cloud: { x: 180, y: 305, w: 190, h: 38 },
+                    active: true
+                },
+                {
+                    id: 7,
+                    rule: `Rule 8 (Min. Seat Cut ${INTERNAL_RULES.minSeatCut})`,
+                    prio: orderPrio,
+                    ref: "Truss T20 on GR02 (HUS28)",
+                    shortText: `T20 (scissor 7/12) arrives at hanger with seat cut 0-2-9 (2-9/16\"), below the ${INTERNAL_RULES.minSeatCut} minimum rule.`,
+                    action: `Lengthen seat cut to 3\" min. and add HANGER HELD UP note.`,
+                    x: 385, y: 365,
+                    targetX: 350, targetY: 325,
+                    cloud: null,
+                    active: true
+                },
+                {
+                    id: 8,
+                    rule: `Rule 10 (Foundation Clearance ${INTERNAL_RULES.foundationClearance})`,
+                    prio: orderPrio,
+                    ref: "Floor F01-F04 with BL1",
+                    shortText: `Raised support 0-8-0: bottom chord starts 0-6-0 from end and hits 8\" foundation wall (requires 8-1/2\").`,
+                    action: `Retract BC start to 0-8-8 to clear ${INTERNAL_RULES.foundationClearance}.`,
+                    x: 590, y: 135,
+                    targetX: 575, targetY: 195,
+                    cloud: null,
+                    active: true
+                },
+                {
+                    id: 9,
+                    rule: "Rule 2 / Package (Ghost Profile R1001)",
+                    prio: "baja",
+                    ref: "Sheet 28 of Profiles",
+                    shortText: "Profile PDF includes default truss 'R1001' (copy of LG01) which does not appear in layout.",
+                    action: "Delete R1001 from run to prevent double charging.",
+                    x: 575, y: 465,
+                    targetX: 545, targetY: 425,
+                    cloud: null,
+                    active: true
+                }
+            ];
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initDefaultFindings();
+            renderFindingsCards();
+            populateAllVerificationTables();
+            setupCanvasMouseInteractions();
+            drawInteractiveCanvas();
+        });
+
+        function switchWorkspaceTab(tabId) {
+            const tabs = {
+                'tab-canvas': { panel: 'workspace-tab-canvas', btn: 'tabbtn-canvas' },
+                'tab-tables': { panel: 'workspace-tab-tables', btn: 'tabbtn-tables' },
+                'tab-matrix': { panel: 'workspace-tab-matrix', btn: 'tabbtn-matrix' }
+            };
+            Object.keys(tabs).forEach(k => {
+                const p = document.getElementById(tabs[k].panel);
+                const b = document.getElementById(tabs[k].btn);
+                if (k === tabId) {
+                    p.classList.remove('hidden');
+                    b.className = "px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white shadow-sm transition";
+                } else {
+                    p.classList.add('hidden');
+                    b.className = "px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition";
+                }
+            });
+            if (tabId === 'tab-canvas') drawInteractiveCanvas();
+        }
+
+        function switchAuditMode(mode) {
+            currentMode = mode;
+            const btnQuote = document.getElementById('btn-mode-quote');
+            const btnOrder = document.getElementById('btn-mode-order');
+            const modeBadge = document.getElementById('phase-mode-badge');
+            const verdictPill = document.getElementById('verdict-pill');
+
+            if (mode === 'quote') {
+                btnQuote.className = "px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 shadow transition flex items-center gap-1.5";
+                btnOrder.className = "px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1.5";
+                modeBadge.textContent = "QUOTE MODE (PRELIMINARY)";
+                modeBadge.className = "font-mono text-amber-600";
+                verdictPill.textContent = "🟠 PRELIMINARY WITH COST ADJUSTMENTS (5 Critical / 3 For Order)";
+                verdictPill.className = "bg-amber-100 text-amber-900 border border-amber-300 font-extrabold px-3 py-1 rounded-full text-[11px]";
+            } else {
+                btnOrder.className = "px-3 py-1.5 rounded-lg bg-blue-600 text-white shadow transition flex items-center gap-1.5";
+                btnQuote.className = "px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1.5";
+                modeBadge.textContent = "ORDER MODE (PRODUCTION)";
+                modeBadge.className = "font-mono text-emerald-600";
+                verdictPill.textContent = "🔴 DO NOT RELEASE TO PLANT (8 High Priority)";
+                verdictPill.className = "bg-rose-100 text-rose-800 border border-rose-300 font-extrabold px-3 py-1 rounded-full text-[11px]";
+            }
+
+            findings.forEach(f => {
+                if (f.id === 6 || f.id === 7 || f.id === 8) {
+                    f.prio = (mode === 'quote') ? 'media' : 'alta';
+                }
+            });
+
+            renderFindingsCards();
+            drawInteractiveCanvas();
+            showToast(`Switched to ${mode === 'quote' ? 'QUOTE MODE (Preliminary)' : 'ORDER MODE (Production)'}`);
+        }
+
+        function toggleStandardsModal() {
+            document.getElementById('standards-modal').classList.toggle('hidden');
+        }
+
+        function savePlantConfig() {
+            plantSettings.plantName = document.getElementById('cfg-plant-name').value.trim() || "TRUSSAUDIT PRO";
+            plantSettings.stockHangers = document.getElementById('cfg-stock-hangers').value.trim() || "HUS26, HUS28, HUS26-2, HUS28-2";
+            plantSettings.deflLimit = document.getElementById('cfg-defl-limit').value;
+
+            document.getElementById('header-standards-summary').textContent =
+                `White-Label QC | Floor: ${plantSettings.deflLimit} | Found. Clr: ${INTERNAL_RULES.foundationClearance} (Rule 10) | Seat Cut: ${INTERNAL_RULES.minSeatCut} (Rule 8) | Stock: ${plantSettings.stockHangers}`;
+
+            initDefaultFindings();
+            renderFindingsCards();
+            populateAllVerificationTables();
+            drawInteractiveCanvas();
+            toggleStandardsModal();
+            showToast("Plant standards updated.");
+        }
+
+        function loadCompleteDemoProject() {
+            uploadedLayoutBuffer = null;
+            uploadedLayoutImage = null;
+            document.getElementById('project-name-input').value = "Oakridge Residential #26410-R";
+            document.getElementById('label-pdf-plans').textContent = "Demo: Plans_A1-A6_S1-S3.pdf (18 pages)";
+            document.getElementById('label-pdf-layout').textContent = "Demo: MiTek_Layout_Original.pdf (2 pages)";
+            document.getElementById('label-pdf-profiles').textContent = "Demo: Profiles_EDD_28_Trusses.pdf (28 pages)";
+            initDefaultFindings();
+            renderFindingsCards();
+            drawInteractiveCanvas();
+            switchWorkspaceTab('tab-canvas');
+            showToast("⚡ Complete Demo Project loaded in viewer.");
+        }
+
+        async function handleLocalPdfUpload(event, slot) {
+            const file = event.target.files[0];
+            if (!file) return;
+            try {
+                const buf = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: buf.slice(0) }).promise;
+                document.getElementById(`label-pdf-${slot}`).textContent = `${file.name} (${pdf.numPages} pages)`;
+
+                if (slot === 'layout') {
+                    uploadedLayoutBuffer = buf.slice(0);
+                    const page = await pdf.getPage(1);
+                    const vp = page.getViewport({ scale: 1.5 });
+                    const offCanvas = document.createElement('canvas');
+                    offCanvas.width = vp.width;
+                    offCanvas.height = vp.height;
+                    await page.render({ canvasContext: offCanvas.getContext('2d'), viewport: vp }).promise;
+                    uploadedLayoutImage = offCanvas;
+                    drawInteractiveCanvas();
+                }
+                showToast(`File "${file.name}" read locally into RAM.`);
+            } catch (e) {
+                console.error(e);
+                showToast("Could not process PDF file.");
+            }
+        }
+
+        function runFourPhaseAudit() {
+            const bar = document.getElementById('phase-progress-bar');
+            const txt = document.getElementById('phase-status-text');
+            bar.style.width = "20%";
+            txt.textContent = "Phase 1/4: Sheet sweep & Snow Drift check...";
+
+            setTimeout(() => {
+                bar.style.width = "50%";
+                txt.textContent = "Phase 2/4: Verifying Knee Walls, Eaves & L/600...";
+            }, 350);
+
+            setTimeout(() => {
+                bar.style.width = "80%";
+                txt.textContent = "Phase 3/4: Auditing Simpson Hangers & Girders...";
+            }, 700);
+
+            setTimeout(() => {
+                bar.style.width = "100%";
+                const activeCount = findings.filter(f => f.active).length;
+                txt.textContent = `✓ 4 Phases Completed (${activeCount} Findings in Markup)`;
+                drawInteractiveCanvas();
+                showToast("🚀 4-Phase QC Audit completed successfully.");
+            }, 1050);
+        }
+
+        // CANVAS DRAWING: LEFT LAYOUT (680px) + RIGHT PANEL 600PT (520px) = 1200x620
+        function drawInteractiveCanvas() {
+            const canvas = document.getElementById('audit-main-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const totalW = canvas.width;  // 1200
+            const totalH = canvas.height; // 620
+            const layoutW = 680;          // Left drawing area
+            const panelX = 680;           // Start of white panel (+600 pt)
+
+            ctx.clearRect(0, 0, totalW, totalH);
+
+            // 1. LAYOUT BACKGROUND
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, layoutW, totalH);
+
+            if (uploadedLayoutImage) {
+                ctx.drawImage(uploadedLayoutImage, 15, 15, layoutW - 30, totalH - 30);
+            } else {
+                drawDemoMiTekTrussLayout(ctx, layoutW, totalH);
+            }
+
+            // 2. PRIVACY REDACTIONS (VISUAL HEADER ANONYMIZER)
+            const hideTitleBlock = document.getElementById('chk-redact-titleblock').checked;
+            const hideHeader = document.getElementById('chk-redact-header').checked;
+
+            if (hideTitleBlock) {
+                ctx.fillStyle = "#090d16";
+                ctx.fillRect(layoutW - 155, 495, 140, 110);
+                ctx.fillStyle = "#10b981";
+                ctx.font = "bold 10px JetBrains Mono";
+                ctx.fillText("🔒 TITLE BLOCK HIDDEN", layoutW - 148, 548);
+                ctx.font = "9px Inter";
+                ctx.fillStyle = "#94a3b8";
+                ctx.fillText("(Client Details Redacted)", layoutW - 146, 564);
+            }
+
+            if (hideHeader) {
+                ctx.fillStyle = "#090d16";
+                ctx.fillRect(22, 16, 330, 32);
+                ctx.fillStyle = "#10b981";
+                ctx.font = "bold 10px JetBrains Mono";
+                ctx.fillText("🔒 CLIENT / ADDRESS ANONYMIZED IN BROWSER", 32, 36);
+            }
+
+            manualBlackBoxes.forEach(box => {
+                ctx.fillStyle = "#090d16";
+                ctx.fillRect(box.x, box.y, box.w, box.h);
+                ctx.strokeStyle = "#10b981";
+                ctx.lineWidth = 1;
+                ctx.strokeRect(box.x, box.y, box.w, box.h);
+            });
+
+            // 3. NUMBERED CALLOUTS & DASHED CLOUDS ON LAYOUT
+            const activeFindings = findings.filter(f => f.active);
+            activeFindings.forEach(f => {
+                const col = f.prio === 'alta' ? '#dc2626' : (f.prio === 'media' ? '#d97706' : '#2563eb');
+
+                if (f.cloud) {
+                    ctx.save();
+                    ctx.strokeStyle = col;
+                    ctx.lineWidth = 1.8;
+                    ctx.setLineDash([5, 3]);
+                    ctx.strokeRect(f.cloud.x, f.cloud.y, f.cloud.w, f.cloud.h);
+                    ctx.restore();
+                }
+
+                ctx.beginPath();
+                ctx.moveTo(f.x, f.y);
+                ctx.lineTo(f.targetX, f.targetY);
+                ctx.strokeStyle = col;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(f.targetX, f.targetY, 3.5, 0, Math.PI * 2);
+                ctx.fillStyle = col;
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(f.x, f.y, 13, 0, Math.PI * 2);
+                ctx.fillStyle = col;
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = "#ffffff";
+                ctx.stroke();
+
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 11px Inter";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(String(f.id), f.x, f.y);
+                ctx.textAlign = "start";
+                ctx.textBaseline = "alphabetic";
+            });
+
+            // 4. RIGHT NOTES PANEL (+600 PT)
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(panelX, 0, totalW - panelX, totalH);
+            ctx.strokeStyle = "#94a3b8";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(panelX, 0);
+            ctx.lineTo(panelX, totalH);
+            ctx.stroke();
+
+            const projTitle = document.getElementById('project-name-input').value.trim() || "MiTek Project";
+            const modeLabel = currentMode === 'quote' ? "(PRELIMINARY)" : "(PRODUCTION)";
+
+            ctx.fillStyle = "#1e3a8a";
+            ctx.font = "bold 10px JetBrains Mono";
+            ctx.fillText(plantSettings.plantName.substring(0, 58), panelX + 18, 24);
+
+            ctx.fillStyle = "#0f172a";
+            ctx.font = "bold 14px Inter";
+            ctx.fillText(`AUDIT REPORT - ${projTitle} ${modeLabel}`, panelX + 18, 44);
+
+            ctx.fillStyle = "#475569";
+            ctx.font = "bold 10px Inter";
+            ctx.fillText("Red = High Priority   |   Orange = For Order   |   Blue = Low Note", panelX + 18, 62);
+
+            ctx.strokeStyle = "#e2e8f0";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(panelX + 16, 70);
+            ctx.lineTo(totalW - 16, 70);
+            ctx.stroke();
+
+            let yCursor = 88;
+            activeFindings.forEach(f => {
+                const col = f.prio === 'alta' ? '#dc2626' : (f.prio === 'media' ? '#d97706' : '#2563eb');
+
+                ctx.beginPath();
+                ctx.arc(panelX + 28, yCursor + 8, 10, 0, Math.PI * 2);
+                ctx.fillStyle = col;
+                ctx.fill();
+
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 10px Inter";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(String(f.id), panelX + 28, yCursor + 8);
+                ctx.textAlign = "start";
+                ctx.textBaseline = "alphabetic";
+
+                ctx.fillStyle = "#0f172a";
+                ctx.font = "bold 11px Inter";
+                ctx.fillText(`${f.rule} — [${f.ref}]`, panelX + 45, yCursor + 5);
+
+                ctx.fillStyle = "#334155";
+                ctx.font = "10px Inter";
+                const descLines = splitStringByLength(f.shortText, 78);
+                descLines.slice(0, 2).forEach((ln, idx) => {
+                    ctx.fillText(ln, panelX + 45, yCursor + 19 + idx * 12);
+                });
+
+                ctx.fillStyle = "#1d4ed8";
+                ctx.font = "bold 9.5px JetBrains Mono";
+                ctx.fillText(`→ ${f.action.substring(0, 74)}`, panelX + 45, yCursor + 44);
+
+                yCursor += 57;
+            });
+
+            ctx.fillStyle = "#64748b";
+            ctx.font = "italic 9.5px Inter";
+            ctx.fillText("Second check: does not replace MiTek engineering calculations.", panelX + 18, totalH - 12);
+        }
+
+        // Demo MiTek Layout Vector Drawing
+        function drawDemoMiTekTrussLayout(ctx, w, h) {
+            ctx.strokeStyle = "#cbd5e1";
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(12, 12, w - 24, h - 24);
+
+            ctx.fillStyle = "#0f172a";
+            ctx.font = "bold 11px JetBrains Mono";
+            ctx.fillText("CLIENT: APEX BUILDERS / RES. OAKRIDGE — 742 EVERGREEN RD", 26, 35);
+            ctx.fillStyle = "#475569";
+            ctx.font = "10px JetBrains Mono";
+            ctx.fillText("SCALE: 1/8\" = 1'-0\"   |   ROOF PITCH: 10/12   |   FLOOR: 16\" @ 19.2\" O.C.", 26, 52);
+
+            ctx.strokeStyle = "#0f172a";
+            ctx.lineWidth = 2.5;
+            ctx.strokeRect(65, 110, 520, 290);
+            ctx.strokeRect(185, 400, 165, 95);
+
+            ctx.fillStyle = "rgba(59, 130, 246, 0.12)";
+            ctx.fillRect(280, 110, 110, 290);
+
+            ctx.strokeStyle = "#2563eb";
+            ctx.lineWidth = 1.2;
+            for (let x = 90; x <= 410; x += 26) {
+                ctx.beginPath();
+                ctx.moveTo(x, 110);
+                ctx.lineTo(x, 400);
+                ctx.stroke();
+            }
+
+            ctx.strokeStyle = "#059669";
+            ctx.lineWidth = 1.3;
+            for (let y = 145; y <= 365; y += 28) {
+                ctx.beginPath();
+                ctx.moveTo(435, y);
+                ctx.lineTo(585, y);
+                ctx.stroke();
+            }
+
+            ctx.strokeStyle = "#dc2626";
+            ctx.lineWidth = 3.5;
+            ctx.beginPath();
+            ctx.moveTo(185, 325);
+            ctx.lineTo(410, 325);
+            ctx.stroke();
+
+            ctx.fillStyle = "#1e293b";
+            ctx.font = "bold 10px JetBrains Mono";
+            ctx.fillText("SGT-A (T10)", 52, 310);
+            ctx.fillText("T01-T08 (ATTIC KNEE WALL)", 102, 132);
+            ctx.fillStyle = "#1d4ed8";
+            ctx.fillText("SNOW DRIFT 56 PSF", 285, 132);
+            ctx.fillStyle = "#dc2626";
+            ctx.fillText("GR02 (2-PLY) - LEFT REAC: 14,280#", 195, 317);
+            ctx.fillText("T20 (HUS28)", 330, 342);
+            ctx.fillStyle = "#047857";
+            ctx.fillText("FLOOR F01-F04 (16\" @ 19.2\")", 435, 132);
+            ctx.fillStyle = "#1e40af";
+            ctx.fillText("LG01 (LAY-IN GABLE H=9'-2 1/4\")", 192, 452);
+
+            ctx.fillStyle = "#475569";
+            ctx.font = "10px JetBrains Mono";
+            ctx.fillText("56'-0\" OVERALL BUILDING LENGTH (2'-0\" O.C. TYP.)", 180, 95);
+            ctx.fillText("O.H. 1'-4 3/4\" (INCL. 2x6 FASCIA)", 65, 535);
+
+            ctx.strokeStyle = "#64748b";
+            ctx.lineWidth = 1.2;
+            ctx.strokeRect(w - 155, 495, 140, 110);
+            ctx.fillStyle = "#334155";
+            ctx.font = "bold 9px Inter";
+            ctx.fillText("PROJECT TITLE BLOCK", w - 145, 515);
+            ctx.font = "8.5px JetBrains Mono";
+            ctx.fillText("Client: Gohn Family", w - 145, 532);
+            ctx.fillText("Tel: (920) 555-0149", w - 145, 548);
+            ctx.fillText("Lot 14 - Two Rivers", w - 145, 564);
+        }
+
+        function setupCanvasMouseInteractions() {
+            const canvas = document.getElementById('audit-main-canvas');
+
+            canvas.addEventListener('mousedown', (e) => {
+                const pt = getCanvasCoords(canvas, e);
+
+                if (document.getElementById('chk-draw-redaction').checked && pt.x < 680) {
+                    isDrawingBlackBox = true;
+                    blackBoxStart = pt;
+                    return;
+                }
+
+                for (let f of findings) {
+                    if (!f.active) continue;
+                    const dist = Math.hypot(pt.x - f.x, pt.y - f.y);
+                    if (dist <= 16) {
+                        draggingCalloutId = f.id;
+                        canvas.style.cursor = 'grabbing';
+                        return;
+                    }
+                }
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                const pt = getCanvasCoords(canvas, e);
+
+                if (draggingCalloutId !== null) {
+                    const f = findings.find(item => item.id === draggingCalloutId);
+                    if (f) {
+                        f.x = Math.max(20, Math.min(660, pt.x));
+                        f.y = Math.max(20, Math.min(600, pt.y));
+                        drawInteractiveCanvas();
+                    }
+                }
+            });
+
+            window.addEventListener('mouseup', (e) => {
+                const canvas = document.getElementById('audit-main-canvas');
+                if (draggingCalloutId !== null) {
+                    draggingCalloutId = null;
+                    updateCanvasCursor();
+                }
+
+                if (isDrawingBlackBox) {
+                    isDrawingBlackBox = false;
+                    const pt = getCanvasCoords(canvas, e);
+                    const w = pt.x - blackBoxStart.x;
+                    const h = pt.y - blackBoxStart.y;
+                    if (Math.abs(w) > 12 && Math.abs(h) > 10) {
+                        manualBlackBoxes.push({
+                            x: Math.min(blackBoxStart.x, pt.x),
+                            y: Math.min(blackBoxStart.y, pt.y),
+                            w: Math.abs(w),
+                            h: Math.abs(h)
+                        });
+                        document.getElementById('custom-redactions-count').textContent = `${manualBlackBoxes.length} manual boxes`;
+                        drawInteractiveCanvas();
+                        showToast("🔒 Confidential area covered in black.");
+                    }
+                }
+            });
+        }
+
+        function updateCanvasCursor() {
+            const canvas = document.getElementById('audit-main-canvas');
+            const isRedact = document.getElementById('chk-draw-redaction').checked;
+            canvas.style.cursor = isRedact ? 'crosshair' : 'grab';
+        }
+
+        function clearManualRedactions() {
+            manualBlackBoxes = [];
+            document.getElementById('custom-redactions-count').textContent = "0 manual boxes";
+            drawInteractiveCanvas();
+            showToast("Manual redaction boxes cleared.");
+        }
+
+        function getCanvasCoords(canvas, event) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: (event.clientX - rect.left) * (canvas.width / rect.width),
+                y: (event.clientY - rect.top) * (canvas.height / rect.height)
+            };
+        }
+
+        function renderFindingsCards() {
+            const grid = document.getElementById('findings-grid');
+            grid.innerHTML = findings.map(f => {
+                const badgeBg = f.prio === 'alta'
+                    ? 'bg-rose-100 text-rose-800 border-rose-200'
+                    : (f.prio === 'media' ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-blue-100 text-blue-800 border-blue-200');
+                const circleBg = f.prio === 'alta' ? 'bg-rose-600' : (f.prio === 'media' ? 'bg-amber-500' : 'bg-blue-600');
+                const prioLabel = f.prio === 'alta' ? 'HIGH PRIORITY' : (f.prio === 'media' ? 'FOR ORDER' : 'LOW NOTE');
+
+                return `
+                    <div onclick="toggleFindingActive(${f.id})" class="p-3 rounded-xl border ${f.active ? 'border-slate-200 bg-slate-50/70' : 'border-slate-200 bg-slate-100 opacity-50'} cursor-pointer hover:border-blue-400 transition space-y-1.5">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span class="w-6 h-6 rounded-full ${circleBg} text-white font-mono text-xs font-bold flex items-center justify-center shrink-0">${f.id}</span>
+                                <span class="text-xs font-bold text-slate-900 truncate">${f.rule}</span>
+                            </div>
+                            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border shrink-0 ${badgeBg}">${prioLabel}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-600 leading-snug">${f.shortText}</p>
+                        <div class="text-[10px] font-mono text-blue-700 font-semibold truncate">→ ${f.action}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleFindingActive(id) {
+            const f = findings.find(item => item.id === id);
+            if (f) {
+                f.active = !f.active;
+                renderFindingsCards();
+                drawInteractiveCanvas();
+            }
+        }
+
+        // POPULATE THE 5 TECHNICAL VERIFICATION TABLES
+        function populateAllVerificationTables() {
+            const setRows = (tbodyId, rowsHtml) => {
+                document.getElementById(tbodyId).innerHTML = rowsHtml;
+            };
+
+            // 1. Girders (Rule 7)
+            setRows('table-body-girders', `
+                <tr class="bg-rose-50/60">
+                    <td class="p-2.5 font-bold text-slate-900">GR02 (2-ply SPF)</td>
+                    <td class="p-2.5">Left Support (J1)</td>
+                    <td class="p-2.5 font-bold text-rose-700">14,280 lb</td>
+                    <td class="p-2.5 text-rose-700">Not written in layout</td>
+                    <td class="p-2.5 font-bold text-rose-700">YES (>= 14,000 lb)</td>
+                    <td class="p-2.5 font-bold text-rose-700">MISSING LOAD AND COLUMN NOTE</td>
+                </tr>
+                <tr>
+                    <td class="p-2.5 font-bold text-slate-900">GR02 (2-ply SPF)</td>
+                    <td class="p-2.5">Right Support (J12)</td>
+                    <td class="p-2.5">9,640 lb</td>
+                    <td class="p-2.5 text-emerald-700">9,700# (OK)</td>
+                    <td class="p-2.5">No (< 14,000 lb)</td>
+                    <td class="p-2.5 text-emerald-700 font-bold">PASSED OK</td>
+                </tr>
+            `);
+
+            // 2. Hangers (Rules 3, 4, 8)
+            setRows('table-body-hangers', `
+                <tr>
+                    <td class="p-2.5 font-bold text-slate-900">GR02 ← T18 (Common)</td>
+                    <td class="p-2.5">2,690# / 410#</td>
+                    <td class="p-2.5">HUS26</td>
+                    <td class="p-2.5">2,920# (SD10212 SPF)</td>
+                    <td class="p-2.5 text-emerald-700">Plan (OK)</td>
+                    <td class="p-2.5 text-emerald-700 font-bold">PASSED (In Stock)</td>
+                </tr>
+                <tr class="bg-rose-50/60">
+                    <td class="p-2.5 font-bold text-slate-900">GR02 ← T20 (Scissor 7/12)</td>
+                    <td class="p-2.5">2,073# / 380#</td>
+                    <td class="p-2.5">HUS28 (Held Up)</td>
+                    <td class="p-2.5">3,340# (SD10212 SPF)</td>
+                    <td class="p-2.5 font-bold text-rose-700">0-2-9 (2-9/16" < ${INTERNAL_RULES.minSeatCut})</td>
+                    <td class="p-2.5 font-bold text-rose-700">FAILS SEAT CUT & MISSING HELD UP NOTE</td>
+                </tr>
+                <tr class="bg-amber-50/60">
+                    <td class="p-2.5 font-bold text-slate-900">GR01 ← GR02 (2-ply)</td>
+                    <td class="p-2.5">6,180# / 920#</td>
+                    <td class="p-2.5">HUS28-2</td>
+                    <td class="p-2.5 text-rose-700">1,745# (Too low)</td>
+                    <td class="p-2.5">Plan (OK)</td>
+                    <td class="p-2.5 font-bold text-amber-800">SUGGEST SPECIAL ORDER: HGUS28-2 (6,415#)</td>
+                </tr>
+            `);
+
+            // 3. Knee Wall / Attic (Rule 9)
+            setRows('table-body-kneewall', `
+                <tr class="bg-rose-50/60">
+                    <td class="p-2.5 font-bold text-slate-900">T01 – T08 (Room-in-Attic)</td>
+                    <td class="p-2.5">5'-6 1/8" @ 5'-0" ext.</td>
+                    <td class="p-2.5">1'-0" (12" Table)</td>
+                    <td class="p-2.5 font-bold text-rose-700">3'-7 1/4" (Missing ~23")</td>
+                    <td class="p-2.5 text-rose-700">Plan: 7'-6" vs MiTek: 2'-8"</td>
+                    <td class="p-2.5 font-bold text-blue-800">Required Heel = 2'-11" (35")</td>
+                </tr>
+            `);
+
+            // 4. Snow Drift ASCE 7-16 (Rule 14)
+            setRows('table-body-drift', `
+                <tr class="bg-rose-50/60">
+                    <td class="p-2.5 font-bold text-slate-900">T09 (At high wall)</td>
+                    <td class="p-2.5">d = 0.0 ft</td>
+                    <td class="p-2.5 font-bold">56.0 psf</td>
+                    <td class="p-2.5">30.0 psf</td>
+                    <td class="p-2.5 font-bold text-rose-700">+26.0 psf</td>
+                    <td class="p-2.5 font-bold text-rose-700">+52.0 plf (@ 24" o.c.)</td>
+                </tr>
+                <tr class="bg-rose-50/60">
+                    <td class="p-2.5 font-bold text-slate-900">T10</td>
+                    <td class="p-2.5">d = 2.0 ft</td>
+                    <td class="p-2.5">47.2 psf</td>
+                    <td class="p-2.5">30.0 psf</td>
+                    <td class="p-2.5 font-bold text-rose-700">+17.2 psf</td>
+                    <td class="p-2.5 font-bold text-rose-700">+34.4 plf (@ 24" o.c.)</td>
+                </tr>
+                <tr class="bg-amber-50/60">
+                    <td class="p-2.5 font-bold text-slate-900">T11</td>
+                    <td class="p-2.5">d = 4.0 ft</td>
+                    <td class="p-2.5">38.4 psf</td>
+                    <td class="p-2.5">30.0 psf</td>
+                    <td class="p-2.5 font-bold text-amber-800">+8.4 psf</td>
+                    <td class="p-2.5 font-bold text-amber-800">+16.8 plf (@ 24" o.c.)</td>
+                </tr>
+                <tr>
+                    <td class="p-2.5 font-bold text-slate-900">T12 (End of w=7'-0" zone)</td>
+                    <td class="p-2.5">d = 6.0 ft</td>
+                    <td class="p-2.5">29.6 psf</td>
+                    <td class="p-2.5">30.0 psf</td>
+                    <td class="p-2.5 text-emerald-700">0.0 psf (Covered)</td>
+                    <td class="p-2.5 text-emerald-700 font-bold">OK (Covered by 30 psf)</td>
+                </tr>
+            `);
+
+            // 5. Floor Trusses (Rules 10 and 11)
+            setRows('table-body-floors', `
+                <tr class="bg-rose-50/60">
+                    <td class="p-2.5 font-bold text-slate-900">F01 (Span 24'-0")</td>
+                    <td class="p-2.5">16" / 19.2" o.c.</td>
+                    <td class="p-2.5">4x2 SPF No.2</td>
+                    <td class="p-2.5 text-emerald-700">L/685 (Passes ${plantSettings.deflLimit})</td>
+                    <td class="p-2.5">BL1 @ 0-8-0</td>
+                    <td class="p-2.5 font-bold text-rose-700">BC @ 0-6-0 vs 8" (HITS FOUNDATION)</td>
+                </tr>
+                <tr class="bg-rose-50/60">
+                    <td class="p-2.5 font-bold text-slate-900">F02 (Span 26'-8")</td>
+                    <td class="p-2.5">16" / 19.2" o.c.</td>
+                    <td class="p-2.5">4x2 SPF No.2</td>
+                    <td class="p-2.5 font-bold text-rose-700">L/515 (-0.55") FAILS ${plantSettings.deflLimit}</td>
+                    <td class="p-2.5">BL1 @ 0-8-0</td>
+                    <td class="p-2.5 text-emerald-700">0-8-8 vs 8" (+${INTERNAL_RULES.foundationClearance} free OK)</td>
+                </tr>
+                <tr class="bg-rose-50/60">
+                    <td class="p-2.5 font-bold text-slate-900">F04 (Span 26'-4")</td>
+                    <td class="p-2.5">16" / 19.2" o.c.</td>
+                    <td class="p-2.5">4x2 SPF No.2</td>
+                    <td class="p-2.5 font-bold text-rose-700">L/524 (-0.54") FAILS ${plantSettings.deflLimit}</td>
+                    <td class="p-2.5">BL1 @ 0-8-0</td>
+                    <td class="p-2.5 text-emerald-700">0-8-8 vs 8" (+${INTERNAL_RULES.foundationClearance} free OK)</td>
+                </tr>
+            `);
+        }
+
+        // PDF EXPORT FEATURE USING PDF-LIB (2-PAGE REPORT)
+        async function downloadRealMarkedPDF() {
+            const btn = document.getElementById('btn-export-pdf');
+            const origText = btn.innerHTML;
+            btn.innerHTML = `<span>⏳ Generating 2-Page Vector PDF Report...</span>`;
+            btn.disabled = true;
+
+            try {
+                const { PDFDocument, rgb, StandardFonts } = PDFLib;
+                const pdfDoc = await PDFDocument.create();
+                const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+                const fontReg = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+                drawInteractiveCanvas();
+                const canvas = document.getElementById('audit-main-canvas');
+                const pngDataUrl = canvas.toDataURL('image/png');
+                const pngImage = await pdfDoc.embedPng(pngDataUrl);
+
+                // PAGE 1: Marked Layout + Right 600pt Panel (1392 x 680 pt landscape)
+                const page1W = 1392;
+                const page1H = 680;
+                const page1 = pdfDoc.addPage([page1W, page1H]);
+                page1.drawImage(pngImage, {
+                    x: 16,
+                    y: 20,
+                    width: page1W - 32,
+                    height: page1H - 40
+                });
+
+                // PAGE 2: 5 Technical Verification Tables
+                const page2 = pdfDoc.addPage([page1W, page1H]);
+                const projTitle = cleanAscii(document.getElementById('project-name-input').value.trim() || "MiTek_Project");
+                const modeTag = currentMode === 'quote' ? "(QUOTE MODE - PRELIMINARY)" : "(ORDER MODE - PRODUCTION)";
+
+                let y = page1H - 45;
+                page2.drawText(`TECHNICAL VERIFICATION TABLES — ${projTitle} ${modeTag}`, {
+                    x: 40, y, size: 15, font: fontBold, color: rgb(0.08, 0.12, 0.22)
+                });
+                y -= 18;
+                page2.drawText(cleanAscii(`${plantSettings.plantName} | Floor Defl: ${plantSettings.deflLimit} | Found. Clearance: ${INTERNAL_RULES.foundationClearance} (Rule 10) | Min Seat Cut: ${INTERNAL_RULES.minSeatCut} (Rule 8) | Stock: ${plantSettings.stockHangers}`), {
+                    x: 40, y, size: 9.5, font: fontReg, color: rgb(0.35, 0.4, 0.45)
+                });
+                y -= 28;
+
+                const pdfSections = [
+                    {
+                        title: "1. GIRDER LOADS IN LAYOUT & MANDATORY NOTE >= 14,000 LB (RULE 7)",
+                        rows: [
+                            ["Girder", "Support", "MiTek Reaction", "Layout Load", "Req. Note >= 14,000#?", "Result"],
+                            ["GR02 (2-ply SPF)", "Left Support (J1)", "14,280 lb", "Not written", "YES REQUIRED", "MISSING LOAD & COLUMN NOTE"],
+                            ["GR02 (2-ply SPF)", "Right Support (J12)", "9,640 lb", "9,700#", "No required", "PASSED OK"]
+                        ]
+                    },
+                    {
+                        title: `2. HANGERS VS PLANT STOCK & 3\" MINIMUM SEAT CUT (RULES 3, 4, AND 8)`,
+                        rows: [
+                            ["Girder / Truss", "Max Grav / Uplift", "MiTek Hanger", "Stock Capacity", "Profile Seat Cut", "Status"],
+                            ["GR02 <- T18", "2,690# / 410#", "HUS26", "2,920# (SD SPF)", "Plan OK", "PASSED (In Stock)"],
+                            ["GR02 <- T20 (7/12)", "2,073# / 380#", "HUS28", "3,340# (SD SPF)", "0-2-9 (< 3\")", "FAILS SEAT CUT + HELD UP NOTE"],
+                            ["GR01 <- GR02", "6,180# / 920#", "HUS28-2", "1,745# (Too low)", "Plan OK", "SPECIAL ORDER -> HGUS28-2"]
+                        ]
+                    },
+                    {
+                        title: "3. TRIGONOMETRIC KNEE WALL & CEILING VERIFICATION IN ATTIC TRUSSES (RULE 9)",
+                        rows: [
+                            ["Trusses", "Plan Knee Wall", "Table Heel Used", "Real MiTek Clearance", "Flat Ceiling", "Required Heel"],
+                            ["T01 - T08 (Attic)", "5'-6 1/8\" @ 5'-0\"", "1'-0\" (12\")", "3'-7 1/4\" (Missing 23\")", "2'-8\" vs 7'-6\"", "Required Heel = 2'-11\" (35\")"]
+                        ]
+                    },
+                    {
+                        title: "4. SPECIAL LOADS / SNOW DRIFT ASCE 7-16 CALCULATION IN PSF AND PLF (RULE 14)",
+                        rows: [
+                            ["Truss", "Dist. to High Wall", "Total Plan Load (psf)", "MiTek Base Snow", "Extra Surcharge (psf)", "Linear Surcharge (plf @ 24\" o.c.)"],
+                            ["T09", "0.0 ft", "56.0 psf", "30.0 psf", "+26.0 psf", "+52.0 plf"],
+                            ["T10", "2.0 ft", "47.2 psf", "30.0 psf", "+17.2 psf", "+34.4 plf"],
+                            ["T11", "4.0 ft", "38.4 psf", "30.0 psf", "+8.4 psf", "+16.8 plf"]
+                        ]
+                    },
+                    {
+                        title: `5. FLOOR TRUSSES: L/600 DEFLECTION & 1/2\" FOUNDATION CLEARANCE (RULES 10 AND 11)`,
+                        rows: [
+                            ["Floor Truss", "Depth / Spacing", "Real Vert(LL)", "Meets Standard", "Bearing Block", "BC Start vs 8\" Wall (+1/2\" Clr)"],
+                            ["F01 (24'-0\")", "16\" / 19.2\" o.c.", "L/685 (-0.42\")", "PASSED OK", "BL1 (0-8-0)", "0-6-0 (HITS FOUNDATION)"],
+                            ["F02 (26'-8\")", "16\" / 19.2\" o.c.", "L/515 (-0.55\")", "FAILS L/600", "BL1 (0-8-0)", "0-8-8 (OK +1/2\" free)"],
+                            ["F04 (26'-4\")", "16\" / 19.2\" o.c.", "L/524 (-0.54\")", "FAILS L/600", "BL1 (0-8-0)", "0-8-8 (OK +1/2\" free)"]
+                        ]
+                    }
+                ];
+
+                const tableW = page1W - 80;
+                pdfSections.forEach(sec => {
+                    page2.drawText(cleanAscii(sec.title), {
+                        x: 40, y, size: 11, font: fontBold, color: rgb(0.12, 0.25, 0.55)
+                    });
+                    y -= 16;
+                    const colW = tableW / sec.rows[0].length;
+
+                    sec.rows.forEach((r, rIdx) => {
+                        const isHeader = rIdx === 0;
+                        page2.drawRectangle({
+                            x: 40, y: y - 4, width: tableW, height: 18,
+                            color: isHeader ? rgb(0.88, 0.91, 0.96) : (rIdx % 2 === 1 ? rgb(0.97, 0.98, 0.99) : rgb(1, 1, 1)),
+                            borderColor: rgb(0.78, 0.82, 0.86),
+                            borderWidth: 0.5
+                        });
+                        r.forEach((cell, cIdx) => {
+                            page2.drawText(cleanAscii(String(cell)).substring(0, 42), {
+                                x: 46 + cIdx * colW,
+                                y: y + 1,
+                                size: 8.5,
+                                font: isHeader ? fontBold : fontReg,
+                                color: rgb(0.1, 0.12, 0.15)
+                            });
+                        });
+                        y -= 18;
+                    });
+                    y -= 16;
+                });
+
+                const pdfBytes = await pdfDoc.save();
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                const safeName = projTitle.replace(/[^a-zA-Z0-9_-]/g, '_');
+                link.href = url;
+                link.download = `${safeName}_layout_revised${currentMode === 'quote' ? '_prelim' : ''}.pdf`;
+                link.click();
+                URL.revokeObjectURL(url);
+
+                showToast("📥 2-Page PDF report downloaded successfully.");
+            } catch (err) {
+                console.error(err);
+                showToast("Error exporting PDF.");
+            } finally {
+                btn.innerHTML = origText;
+                btn.disabled = false;
+            }
+        }
+
+        function splitStringByLength(str, maxLen) {
+            const words = str.split(' ');
+            const lines = [];
+            let current = "";
+            for (const w of words) {
+                if ((current + " " + w).trim().length <= maxLen) {
+                    current = (current + " " + w).trim();
+                } else {
+                    lines.push(current);
+                    current = w;
+                }
+            }
+            if (current) lines.push(current);
+            return lines;
+        }
+
+        function cleanAscii(str) {
+            return str
+                .replace(/[—–]/g, "-")
+                .replace(/[^\x00-\x7F]/g, "");
+        }
+
+        function showToast(msg) {
+            const box = document.getElementById('toast-box');
+            document.getElementById('toast-text').textContent = msg;
+            box.classList.remove('hidden');
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => box.classList.add('hidden'), 3200);
+        }
+    </script>
+</body>
+</html>
