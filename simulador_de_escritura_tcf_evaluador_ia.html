@@ -1,1688 +1,436 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Réussir TCF Canada — Studio d'Expression Écrite (Sujets d'Actualité 2026)</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Plus Jakarta Sans & Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-        }
-        h1, h2, h3, .font-heading {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-        /* Animación de parpadeo suave para exceso de palabras */
-        @keyframes pulseRed {
-            0%, 100% { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; }
-            50% { background-color: #fecaca; border-color: #dc2626; color: #7f1d1d; }
-        }
-        .blink-red {
-            animation: pulseRed 1.2s infinite;
-        }
-        /* Scrollbar personalizada */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 9999px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Réussir TCF Canada — Studio d'Expression Écrite (2026)</title>
+  <style>
+    :root {
+      --primary: #1E3A8A;
+      --secondary: #3B82F6;
+      --accent: #F59E0B;
+      --background: #F3F4F6;
+      --text: #1F2937;
+      --success: #10B981;
+      --error: #EF4444;
+      --warning: #F59E0B;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--background);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      background-color: var(--primary);
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    .main-container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    .left-panel, .right-panel {
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .left-panel {
+      flex: 2;
+      border-right: 1px solid #E5E7EB;
+      background-color: white;
+    }
+    .right-panel {
+      flex: 1;
+      background-color: #F9FAFB;
+    }
+    .sujet-selector {
+      margin-bottom: 20px;
+    }
+    select {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #D1D5DB;
+      border-radius: 5px;
+      background-color: white;
+    }
+    .task-container {
+      margin-bottom: 20px;
+      padding: 15px;
+      background-color: #F3F4F6;
+      border-radius: 8px;
+      border-left: 4px solid var(--secondary);
+    }
+    .task-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+      color: var(--primary);
+    }
+    .task-desc {
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+      padding: 15px;
+      font-size: 1rem;
+      border: 1px solid #D1D5DB;
+      border-radius: 5px;
+      resize: vertical;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .word-count {
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 5px;
+      background-color: #E5E7EB;
+    }
+    .status-green { background-color: var(--success); color: white; }
+    .status-yellow { background-color: var(--warning); color: white; }
+    .status-red { background-color: var(--error); color: white; animation: blink 1s linear infinite; }
+    
+    @keyframes blink {
+      50% { opacity: 0.5; }
+    }
+    
+    .btn {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    .btn-primary {
+      background-color: var(--secondary);
+      color: white;
+    }
+    .btn-primary:hover {
+      background-color: #2563EB;
+    }
+    .btn-correction {
+      background-color: var(--primary);
+      color: white;
+      margin-top: 10px;
+      width: 100%;
+    }
+    .keyboard {
+      display: flex;
+      gap: 5px;
+      margin-top: 10px;
+    }
+    .key {
+      padding: 5px 10px;
+      background-color: #E5E7EB;
+      border: 1px solid #D1D5DB;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .key:hover {
+      background-color: #D1D5DB;
+    }
+    .methodology-box {
+      background-color: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+    .methodology-box h3 {
+      margin-top: 0;
+      color: var(--primary);
+      font-size: 1.1rem;
+      border-bottom: 1px solid #E5E7EB;
+      padding-bottom: 5px;
+    }
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+    .checklist-icon {
+      margin-right: 10px;
+      color: #9CA3AF;
+    }
+    .checklist-item.met .checklist-icon {
+      color: var(--success);
+    }
+    .correction-model {
+      display: none;
+      margin-top: 15px;
+      padding: 15px;
+      background-color: #ECFDF5;
+      border-left: 4px solid var(--success);
+      border-radius: 5px;
+    }
+    .timer {
+      font-size: 1.2rem;
+      font-weight: bold;
+      font-family: monospace;
+    }
+    
+    /* Documentos Lado a Lado para Tarea 3 */
+    .docs-container {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    .doc-box {
+      flex: 1;
+      background: white;
+      padding: 15px;
+      border-radius: 5px;
+      border: 1px solid #D1D5DB;
+      font-size: 0.95rem;
+    }
+    .doc-title {
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
-<body class="text-slate-800 min-h-screen flex flex-col">
+<body>
 
-    <!-- Top TCF Canada / France Accent Bar -->
-    <div class="h-1.5 w-full flex">
-        <div class="w-1/4 bg-red-600"></div>
-        <div class="w-2/4 bg-white"></div>
-        <div class="w-1/4 bg-blue-800"></div>
+  <header>
+    <h1>Réussir TCF Canada — Studio d'Expression Écrite</h1>
+    <div class="timer" id="timer">60:00</div>
+    <div>
+      <button class="btn" style="background-color: white; color: var(--primary);">+ Importer / IA Sujet</button>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <div class="left-panel">
+      <div class="sujet-selector">
+        <label for="sujetSelect" style="font-weight: bold; margin-bottom: 5px; display: block;">Sélectionnez une Combinaison (Actualités 2026):</label>
+        <select id="sujetSelect" onchange="changeSujet()">
+          <optgroup label="Octobre 2026">
+            <option value="oct-1">Combinaison 1: Festival, Lecture enfants, Langues en ligne</option>
+            <option value="oct-8">Combinaison 8: Resto blog, Prêt appartement, Dîner collègues</option>
+          </optgroup>
+          <optgroup label="Septembre 2026">
+            <option value="sept-9">Combinaison 9: Déménagement Léo, Bénévolat seniors, Jeux vidéos</option>
+          </optgroup>
+          <optgroup label="Août 2026">
+            <option value="aout-4">Combinaison 4: Transports Anna, Fête voisins, Distributeurs écoles</option>
+          </optgroup>
+          <optgroup label="🔒 Pack PRO">
+            <option value="pro" disabled>🔓 Débloquer les 60 Combinaisons 2025/2026</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <!-- TACHE 1 -->
+      <div class="task-container" id="task1-container">
+        <div class="task-title">Tâche 1 (60 - 120 mots)</div>
+        <div class="task-desc" id="task1-desc">
+          <strong>Sujet :</strong> Vous organisez un festival musical dans votre ville. Vous écrivez un message sur les réseaux sociaux pour inviter vos amis. Décrivez le programme et proposez-leur de vous rejoindre.
+        </div>
+        <textarea id="task1-text" placeholder="Tapez votre texte ici..." oninput="updateWordCount(1, 60, 120); checkMethodology(1)"></textarea>
+        <div class="keyboard">
+          <button class="key" onclick="insertChar('task1-text', 'é')">é</button>
+          <button class="key" onclick="insertChar('task1-text', 'è')">è</button>
+          <button class="key" onclick="insertChar('task1-text', 'ê')">ê</button>
+          <button class="key" onclick="insertChar('task1-text', 'à')">à</button>
+          <button class="key" onclick="insertChar('task1-text', 'ç')">ç</button>
+          <button class="key" onclick="insertChar('task1-text', 'œ')">œ</button>
+        </div>
+        <div class="controls">
+          <div class="word-count status-yellow" id="task1-count">0 mots</div>
+        </div>
+        <button class="btn btn-correction" onclick="toggleCorrection(1)">Voir Correction Modèle (NCLC 10 / C1)</button>
+        <div class="correction-model" id="correction1">
+          <strong>Modèle C1 :</strong> "Salut à tous ! 🎵 Je vous annonce avec enthousiasme l'ouverture du festival « Nuits Sonores » ce week-end au parc central ! Le programme est incroyable : du jazz en plein air l'après-midi, suivi de DJ sets électro internationaux jusqu'à l'aube. Il y aura aussi des food trucks locaux. Ça vous dit de vous joindre à moi samedi vers 18h ? Prenez vos billets vite, ça part très vite ! Hâte de vous y voir. À très vite !" <em>(78 mots)</em>
+        </div>
+      </div>
+
+      <!-- TACHE 2 -->
+      <div class="task-container" id="task2-container">
+        <div class="task-title">Tâche 2 (120 - 150 mots)</div>
+        <div class="task-desc" id="task2-desc">
+          <strong>Sujet :</strong> Vous écrivez un article pour un blog sur l'importance de la lecture chez les enfants. Racontez votre propre expérience d'enfant lecteur et donnez votre avis sur les écrans aujourd'hui.
+        </div>
+        <textarea id="task2-text" placeholder="Tapez votre texte ici..." oninput="updateWordCount(2, 120, 150); checkMethodology(2)"></textarea>
+        <div class="keyboard">
+          <button class="key" onclick="insertChar('task2-text', 'é')">é</button>
+          <button class="key" onclick="insertChar('task2-text', 'è')">è</button>
+          <button class="key" onclick="insertChar('task2-text', 'ê')">ê</button>
+          <button class="key" onclick="insertChar('task2-text', 'à')">à</button>
+          <button class="key" onclick="insertChar('task2-text', 'ç')">ç</button>
+        </div>
+        <div class="controls">
+          <div class="word-count status-yellow" id="task2-count">0 mots</div>
+        </div>
+        <button class="btn btn-correction" onclick="toggleCorrection(2)">Voir Correction Modèle (NCLC 10 / C1)</button>
+        <div class="correction-model" id="correction2">
+          <strong>Modèle C1 (Structure de blog) :</strong> Titre clair, récit au passé, opinion tranchée avec connecteurs (Cependant, de nos jours...). 
+        </div>
+      </div>
+
+      <!-- TACHE 3 -->
+      <div class="task-container" id="task3-container">
+        <div class="task-title">Tâche 3 (120 - 180 mots)</div>
+        <div class="task-desc">
+          <strong>Sujet :</strong> L'apprentissage des langues exclusivement en ligne remplacera-t-il les cours en présentiel ? Rédigez un court article. Résumez d'abord les deux documents (40-60 mots), puis donnez votre point de vue argumenté (80-120 mots).
+        </div>
+        
+        <div class="docs-container">
+          <div class="doc-box">
+            <div class="doc-title">Document A</div>
+            "Les plateformes numériques offrent une flexibilité inégalée. L'intelligence artificielle permet désormais de corriger la prononciation en temps réel, rendant les déplacements en école de langues superflus."
+          </div>
+          <div class="doc-box">
+            <div class="doc-title">Document B</div>
+            "Apprendre une langue, c'est avant tout un échange humain. La dynamique de groupe, les rires et les interactions spontanées dans une salle de classe ne pourront jamais être reproduits derrière un écran."
+          </div>
+        </div>
+
+        <textarea id="task3-text" placeholder="Tapez votre texte ici..." oninput="updateWordCount(3, 120, 180); checkMethodology(3)"></textarea>
+        <div class="controls">
+          <div class="word-count status-yellow" id="task3-count">0 mots</div>
+        </div>
+        <button class="btn btn-correction" onclick="toggleCorrection(3)">Voir Correction Modèle (NCLC 10 / C1)</button>
+        <div class="correction-model" id="correction3">
+          <strong>Modèle C1 :</strong> <br>
+          <em>Partie 1 (Synthèse) :</em> Ces deux textes abordent l'avenir de l'apprentissage linguistique. Le premier document vante la flexibilité et l'efficacité technologique des cours virtuels. En revanche, le second défend l'idée que l'interaction humaine et la chaleur d'une salle de classe restent irremplaçables. (40 mots)<br><br>
+          <em>Partie 2 (Opinion) :</em> À mon sens, bien que le numérique soit un outil redoutable, il ne supplantera jamais totalement le présentiel. D'une part, l'immersion socioculturelle exige des nuances non verbales qu'un écran gomme inévitablement. D'autre part, la motivation s'érode souvent sans la stimulation d'un groupe physique. Néanmoins, l'avenir réside probablement dans un modèle hybride, alliant l'accessibilité des applications à la richesse des rencontres réelles. (63 mots)
+        </div>
+      </div>
+
     </div>
 
-    <!-- Header Navigation -->
-    <header class="bg-slate-900 text-white shadow-xl sticky top-0 z-30 border-b border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap justify-between items-center gap-4">
-            <!-- Brand -->
-            <div class="flex items-center space-x-3">
-                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-red-600 via-rose-600 to-blue-800 flex items-center justify-center font-extrabold text-lg shadow-lg border border-white/15">
-                    <i class="fa-brands fa-canadian-maple-leaf text-white text-xl"></i>
-                </div>
-                <div>
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <h1 class="font-extrabold text-base sm:text-lg tracking-tight">Réussir TCF Canada — Studio Écrite</h1>
-                        <span class="text-[11px] bg-red-500/20 border border-red-400/40 text-red-200 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Sujets d'Actualité 2026</span>
-                    </div>
-                    <p class="text-xs text-slate-400">Combinaisons réelles par mois • Méthodologie officielle • Correcteur IA NCLC 7–10+</p>
-                </div>
-            </div>
+    <!-- Right Panel: Methodology -->
+    <div class="right-panel">
+      <div class="methodology-box" id="meth1">
+        <h3>Méthodologie Tâche 1</h3>
+        <div class="checklist-item" id="c1-1"><span class="checklist-icon">✖</span> Salutation présente (Salut, Bonjour)</div>
+        <div class="checklist-item" id="c1-2"><span class="checklist-icon">✖</span> Ton informel / tutoiement utilisé</div>
+        <div class="checklist-item" id="c1-3"><span class="checklist-icon">✖</span> 60 à 120 mots atteints</div>
+      </div>
 
-            <!-- Main Navigation Tabs -->
-            <nav class="flex bg-slate-800/90 p-1 rounded-xl border border-slate-700 overflow-x-auto max-w-full">
-                <button onclick="switchMainTab('simulador')" id="nav-simulador" class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-2 bg-red-600 text-white shadow">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                    <span>1. Sujets d'Actualité & Simulateur</span>
-                </button>
-                <button onclick="switchMainTab('methodologie')" id="nav-methodologie" class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-2 text-slate-300 hover:text-white">
-                    <i class="fa-solid fa-compass-drafting"></i>
-                    <span>2. Méthodologie & Squelettes C1</span>
-                </button>
-                <button onclick="switchMainTab('entrainement')" id="nav-entrainement" class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-2 text-slate-300 hover:text-white">
-                    <i class="fa-solid fa-bolt"></i>
-                    <span>3. Quiz Connecteurs NCLC 9+</span>
-                </button>
-            </nav>
+      <div class="methodology-box" id="meth2">
+        <h3>Méthodologie Tâche 2</h3>
+        <div class="checklist-item" id="c2-1"><span class="checklist-icon">✖</span> Temps du passé (imparfait/passé composé)</div>
+        <div class="checklist-item" id="c2-2"><span class="checklist-icon">✖</span> Opinion exprimée (À mon avis, Je pense)</div>
+        <div class="checklist-item" id="c2-3"><span class="checklist-icon">✖</span> 120 à 150 mots atteints</div>
+      </div>
 
-            <!-- Action Buttons -->
-            <div class="flex items-center gap-2">
-                <button onclick="openImportModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow transition" title="Importar una nueva Combinaison de reussir-tcfcanada.com o generarla con IA">
-                    <i class="fa-solid fa-plus-circle"></i>
-                    <span>+ Importer / IA Sujet</span>
-                </button>
-                <button onclick="exportCurrentCombinaison()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-1.5 transition" title="Descargar tus redacciones en archivo .txt">
-                    <i class="fa-solid fa-download text-emerald-400"></i>
-                    <span class="hidden md:inline">Exporter (.txt)</span>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-3 transition-all duration-300">
-        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400"></i>
-        <span id="toast-msg" class="text-sm font-medium">Action complétée</span>
+      <div class="methodology-box" id="meth3">
+        <h3>Méthodologie Tâche 3</h3>
+        <div class="checklist-item" id="c3-1"><span class="checklist-icon">✖</span> Connecteur d'opposition (En revanche, Mais)</div>
+        <div class="checklist-item" id="c3-2"><span class="checklist-icon">✖</span> Structure bipartite (Synthèse + Opinion)</div>
+        <div class="checklist-item" id="c3-3"><span class="checklist-icon">✖</span> 120 à 180 mots atteints</div>
+      </div>
     </div>
-
-    <!-- ========================================================= -->
-    <!-- MODULE 1: SUJETS D'ACTUALITÉ 2026 & SIMULATEUR OFFICIEL    -->
-    <!-- ========================================================= -->
-    <main id="module-simulador" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-
-        <!-- Month Filter Pills + Combinaison Selector + 60-Min Timer -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 mb-6 space-y-4">
-            <div class="flex flex-wrap items-center justify-between gap-4">
-                
-                <!-- Month Filter Pills (Octobre 2026, Septembre 2026, Août 2026, Personnalisés) -->
-                <div class="flex flex-wrap items-center gap-2">
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 mr-1 flex items-center gap-1.5">
-                        <i class="fa-regular fa-calendar-check text-red-600"></i> Mois d'examen :
-                    </span>
-                    <button onclick="filterByMonth('ALL')" id="month-ALL" class="px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-900 text-white">
-                        Tous (2026)
-                    </button>
-                    <button onclick="filterByMonth('Octobre 2026')" id="month-Octobre 2026" class="px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200">
-                        Octobre 2026
-                    </button>
-                    <button onclick="filterByMonth('Septembre 2026')" id="month-Septembre 2026" class="px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200">
-                        Septembre 2026
-                    </button>
-                    <button onclick="filterByMonth('Août 2026')" id="month-Août 2026" class="px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200">
-                        Août 2026
-                    </button>
-                    <button onclick="filterByMonth('Importés / IA')" id="month-Importés / IA" class="px-3 py-1.5 rounded-xl text-xs font-bold transition bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100">
-                        <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Mes Sujets Importés
-                    </button>
-                </div>
-
-                <!-- 60-Min Official Exam Timer with Task Pacing -->
-                <div class="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-xl border border-slate-200">
-                    <div class="flex items-center gap-2.5">
-                        <i class="fa-regular fa-clock text-red-600 text-lg"></i>
-                        <div>
-                            <div class="flex items-center gap-1.5">
-                                <span class="text-[10px] uppercase font-bold text-slate-400 leading-none">Chrono Examen</span>
-                                <span id="timer-pace-hint" class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.2 rounded">Conseil: 10m T1</span>
-                            </div>
-                            <span id="timer-display" class="font-mono text-xl font-extrabold text-slate-800">60:00</span>
-                        </div>
-                    </div>
-                    <div class="h-6 w-px bg-slate-300 mx-1"></div>
-                    <button onclick="toggleTimer()" id="timer-btn" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-sm">
-                        <i class="fa-solid fa-play" id="timer-icon"></i>
-                        <span id="timer-btn-text">Démarrer</span>
-                    </button>
-                    <button onclick="resetTimer()" class="text-slate-500 hover:text-slate-800 text-xs px-2 py-1.5 rounded-lg hover:bg-slate-200 transition" title="Réinitialiser à 60:00">
-                        <i class="fa-solid fa-rotate-right"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Combinaison Selector Bar -->
-            <div class="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
-                <div class="flex flex-wrap items-center gap-2 flex-1">
-                    <label for="combinaison-select" class="text-xs font-extrabold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
-                        <i class="fa-solid fa-layer-group text-indigo-600"></i> Combinaison Officielle :
-                    </label>
-                    <select id="combinaison-select" onchange="handleCombinaisonChange(this.value)" class="flex-1 min-w-[260px] bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl px-3.5 py-2.5 font-semibold focus:ring-2 focus:ring-red-500 focus:outline-none">
-                    </select>
-                </div>
-
-                <div class="flex items-center gap-2">
-                    <button onclick="toggleModelCorrection()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-bold px-3.5 py-2.5 rounded-xl transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-award text-emerald-600"></i>
-                        <span>Voir Correction Modèle (NCLC 10 / C1)</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Simulator Workspace Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-            <!-- Left/Center Column (8 cols): Tasks, Consigne, Editor, Model Answer & AI Evaluator -->
-            <div class="lg:col-span-8 space-y-5">
-
-                <!-- 3 Task Tabs with Official Timing & Word Ranges -->
-                <div class="grid grid-cols-3 gap-3">
-                    <button onclick="selectTask(1)" id="tab-tache-1" class="p-3.5 rounded-2xl border text-left transition flex flex-col justify-between bg-slate-900 text-white border-slate-900 shadow-md">
-                        <div class="flex items-center justify-between w-full mb-1">
-                            <span class="font-extrabold text-sm">Tâche 1</span>
-                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-red-500/30 text-red-200 font-bold">⏱ 10 min</span>
-                        </div>
-                        <p class="text-xs opacity-90 font-medium">60 à 120 mots • Message / Courriel</p>
-                    </button>
-
-                    <button onclick="selectTask(2)" id="tab-tache-2" class="p-3.5 rounded-2xl border text-left transition flex flex-col justify-between bg-white text-slate-700 border-slate-200 hover:border-slate-400">
-                        <div class="flex items-center justify-between w-full mb-1">
-                            <span class="font-extrabold text-sm">Tâche 2</span>
-                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-bold">⏱ 20 min</span>
-                        </div>
-                        <p class="text-xs text-slate-500 font-medium">120 à 150 mots • Article de blog</p>
-                    </button>
-
-                    <button onclick="selectTask(3)" id="tab-tache-3" class="p-3.5 rounded-2xl border text-left transition flex flex-col justify-between bg-white text-slate-700 border-slate-200 hover:border-slate-400">
-                        <div class="flex items-center justify-between w-full mb-1">
-                            <span class="font-extrabold text-sm">Tâche 3</span>
-                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-bold">⏱ 30 min</span>
-                        </div>
-                        <p class="text-xs text-slate-500 font-medium">120 à 180 mots • Synthèse + Opinion</p>
-                    </button>
-                </div>
-
-                <!-- Official Consigne Card -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-                        <div class="flex items-center gap-2">
-                            <span id="task-badge" class="text-xs font-extrabold uppercase tracking-wider text-white bg-red-600 px-2.5 py-1 rounded-lg">
-                                Tâche 1
-                            </span>
-                            <span id="combinaison-badge" class="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">
-                                Octobre 2026 • Combinaison 1
-                            </span>
-                        </div>
-                        <span id="task-word-target" class="text-xs font-bold text-slate-600 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-lg">
-                            Exigence : 60 mots minimum / 120 mots maximum
-                        </span>
-                    </div>
-
-                    <p id="task-prompt" class="text-slate-800 font-medium text-sm sm:text-base leading-relaxed mt-2"></p>
-
-                    <!-- Tâche 3 Side-by-Side Documents (Doc 1 & Doc 2) -->
-                    <div id="tache3-docs" class="hidden grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-100">
-                        <div class="bg-blue-50/60 border border-blue-200 rounded-xl p-4">
-                            <div class="flex items-center justify-between mb-1.5">
-                                <span class="flex items-center gap-1.5 text-blue-900 font-extrabold text-xs uppercase">
-                                    <i class="fa-regular fa-file-lines"></i> Document 1
-                                </span>
-                                <span class="text-[10px] font-semibold text-blue-700 bg-blue-100 px-2 py-0.5 rounded">Thèse A</span>
-                            </div>
-                            <p id="doc1-content" class="text-xs sm:text-sm text-slate-700 leading-relaxed italic"></p>
-                        </div>
-                        <div class="bg-rose-50/60 border border-rose-200 rounded-xl p-4">
-                            <div class="flex items-center justify-between mb-1.5">
-                                <span class="flex items-center gap-1.5 text-rose-900 font-extrabold text-xs uppercase">
-                                    <i class="fa-regular fa-file-lines"></i> Document 2
-                                </span>
-                                <span class="text-[10px] font-semibold text-rose-700 bg-rose-100 px-2 py-0.5 rounded">Thèse B</span>
-                            </div>
-                            <p id="doc2-content" class="text-xs sm:text-sm text-slate-700 leading-relaxed italic"></p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Collapsible Model Correction Panel (NCLC 10+ / C1) -->
-                <div id="model-correction-panel" class="hidden bg-emerald-950 text-emerald-50 rounded-2xl shadow-lg border border-emerald-700 overflow-hidden">
-                    <div class="px-5 py-3.5 bg-emerald-900/70 border-b border-emerald-800 flex flex-wrap items-center justify-between gap-2">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-medal text-amber-400 text-lg"></i>
-                            <div>
-                                <h3 class="font-bold text-sm text-white">Correction Modèle Réussir TCF Canada (Niveau C1 • NCLC 10+)</h3>
-                                <p class="text-[11px] text-emerald-200">Exemple de rédaction idéale respectant la structure officielle et le nombre de mots</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button onclick="speakModelCorrection()" class="bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
-                                <i class="fa-solid fa-volume-high"></i> Écouter
-                            </button>
-                            <button onclick="loadModelIntoEditor()" class="bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-extrabold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
-                                <i class="fa-solid fa-file-import"></i> Charger dans l'éditeur
-                            </button>
-                            <button onclick="toggleModelCorrection()" class="text-emerald-300 hover:text-white px-2">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="p-5">
-                        <div id="model-correction-text" class="text-sm leading-relaxed whitespace-pre-line font-normal text-emerald-50 bg-emerald-900/40 p-4 rounded-xl border border-emerald-800/80"></div>
-                        <div class="mt-3 flex items-center justify-between text-xs text-emerald-300">
-                            <span id="model-word-count-badge" class="font-mono font-bold"></span>
-                            <span>💡 Astuce : Observez la séparation claire des paragraphes et les connecteurs logiques.</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Writing Editor Box -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                    
-                    <!-- French Special Characters Virtual Keyboard + Quick Insert -->
-                    <div class="bg-slate-50 border-b border-slate-200 p-3 flex flex-wrap items-center justify-between gap-2">
-                        <div class="flex flex-wrap items-center gap-1">
-                            <span class="text-xs font-bold text-slate-500 mr-1.5 flex items-center gap-1">
-                                <i class="fa-solid fa-keyboard text-red-600"></i> Accents FR :
-                            </span>
-                            <button onclick="insertAtCursor('é')" class="w-8 h-8 rounded-lg bg-white border border-slate-300 hover:bg-red-50 hover:border-red-400 font-bold text-sm shadow-sm transition">é</button>
-                            <button onclick="insertAtCursor('è')" class="w-8 h-8 rounded-lg bg-white border border-slate-300 hover:bg-red-50 hover:border-red-400 font-bold text-sm shadow-sm transition">è</button>
-                            <button onclick="insertAtCursor('ê')" class="w-8 h-8 rounded-lg bg-white border border-slate-300 hover:bg-red-50 hover:border-red-400 font-bold text-sm shadow-sm transition">ê</button>
-                            <button onclick="insertAtCursor('ë')" class="w-8 h-8 rounded-lg bg-white border border-slate-300 hover:bg-red-50 hover:border-red-400 font-bold text-sm shadow-sm transition">ë</button>
-                            <button onclick="insertAtCursor('à')" class="w-8 h-8 rounded-lg bg-white border border-slate-300 hover:bg-red-50 hover:border-red-400 font-bold text-sm shadow-sm transition">à</button>
-                            <button onclick="insertAtCursor('â')" class="w-8 h-8 rounded-lg bg-white border border-slate-300 hover:bg-red-50 hover:border-red-400 font-bold text-sm shadow-sm transition">â</button>
-                            <button onclick="insertAtCursor('ù')" class="w-8 h-8 rounded-lg bg-white border border-slate-300 hover:bg-red-50 hover:border-red-400 font-bold text-sm shadow-sm transition">ù</button>
-                            <button onclick="insertAtCursor('û')" class="w-8 h-8 rounded-lg bg-white border border-slate-300 hover:bg-red-50 hover:border-red-400 font-bold text-sm shadow-sm transition">û</button>
-                            <button onclick="insertAtCursor('ç')" class="w-8 h-8 rounded-lg bg-white border border-slate-300 hover:bg-red-50 hover:border-red-400 font-bold text-sm shadow-sm transition">ç</button>
-                            <button onclick="insertAtCursor('î')" class="w-8 h-8 rounded-lg bg-white border border-slate-300 hover:bg-red-50 hover:border-red-400 font-bold text-sm shadow-sm transition">î</button>
-                            <button onclick="insertAtCursor('ô')" class="w-8 h-8 rounded-lg bg-white border border-slate-300 hover:bg-red-50 hover:border-red-400 font-bold text-sm shadow-sm transition">ô</button>
-                            <button onclick="insertAtCursor('œ')" class="w-8 h-8 rounded-lg bg-white border border-slate-300 hover:bg-red-50 hover:border-red-400 font-bold text-sm shadow-sm transition">œ</button>
-                            <button onclick="insertAtCursor('« ')" class="w-8 h-8 rounded-lg bg-white border border-slate-300 hover:bg-red-50 hover:border-red-400 font-bold text-sm shadow-sm transition">«</button>
-                            <button onclick="insertAtCursor(' »')" class="w-8 h-8 rounded-lg bg-white border border-slate-300 hover:bg-red-50 hover:border-red-400 font-bold text-sm shadow-sm transition">»</button>
-                        </div>
-
-                        <div class="flex items-center gap-1.5">
-                            <button onclick="insertSkeletonForCurrentTask()" class="text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-lg transition flex items-center gap-1" title="Insertar plantilla de estructura oficial para esta tarea">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i> Insérer Squelette
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Textarea -->
-                    <div class="p-4">
-                        <textarea id="essay-editor" oninput="handleEditorInput()" rows="11" placeholder="Rédigez votre réponse ici... (Utilisez la checklist méthodologique à droite pour vérifier que vous n'oubliez aucune étape obligatoire du TCF Canada)" class="w-full text-slate-800 placeholder-slate-400 text-base leading-relaxed focus:outline-none resize-y"></textarea>
-                    </div>
-
-                    <!-- Tâche 3 Two-Part Split Meter (40-60 words Synthèse + 80-120 words Opinion) -->
-                    <div id="tache3-split-meter" class="hidden bg-slate-50/80 border-t border-slate-100 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold text-slate-600"><i class="fa-solid fa-scale-balanced text-indigo-600 mr-1"></i>Équilibre Tâche 3 :</span>
-                            <span id="t3-part1-badge" class="px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-semibold">1re Partie (Synthèse): 0 mots (Cible: 40-60)</span>
-                            <span id="t3-part2-badge" class="px-2 py-0.5 rounded bg-purple-100 text-purple-800 font-semibold">2e Partie (Opinion): 0 mots (Cible: 80-120)</span>
-                        </div>
-                        <span class="text-[11px] text-slate-400">Séparez vos paragraphes avec une ligne vide (Entrée)</span>
-                    </div>
-
-                    <!-- Editor Footer: Word Counter Traffic Light + AI Evaluation Trigger -->
-                    <div class="bg-slate-50 border-t border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-                        <div class="flex items-center gap-3">
-                            <div id="word-traffic-light" class="px-3.5 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-2 bg-amber-100 border-amber-300 text-amber-800 transition-all">
-                                <span id="traffic-dot" class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                                <span id="word-count-number">0 mots</span>
-                                <span class="opacity-80" id="word-status-label">(Minimum 60 mots)</span>
-                            </div>
-                            <button onclick="clearEditor()" class="text-xs text-slate-400 hover:text-red-600 font-medium transition">
-                                <i class="fa-solid fa-trash-can"></i> Effacer
-                            </button>
-                        </div>
-
-                        <button onclick="evaluateEssayWithAI()" id="btn-evaluate" class="bg-gradient-to-r from-red-600 via-rose-600 to-indigo-700 hover:from-red-700 hover:to-indigo-800 text-white font-bold px-5 py-2.5 rounded-xl text-sm shadow-md hover:shadow-lg transition flex items-center gap-2">
-                            <i class="fa-solid fa-robot"></i>
-                            <span>Corriger ma copie (Barème NCLC / TCF)</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- AI Evaluation Report Panel -->
-                <div id="ai-evaluation-panel" class="hidden bg-white rounded-2xl shadow-xl border-2 border-indigo-500/30 overflow-hidden">
-                    <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white px-6 py-4 flex flex-wrap items-center justify-between gap-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center text-amber-400 text-xl">
-                                <i class="fa-solid fa-file-signature"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-base">Rapport de Correction Officiel TCF Canada</h3>
-                                <p class="text-xs text-slate-300">Évaluation selon les 4 critères de France Éducation International & IRCC</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <div class="text-right">
-                                <span id="eval-nclc-badge" class="inline-block bg-emerald-400 text-slate-950 font-extrabold text-sm px-3 py-1 rounded-lg shadow">NCLC 9 • C1</span>
-                                <span id="eval-score-badge" class="block text-xs text-indigo-200 mt-1 font-mono font-bold">Score TCF : 15 / 20</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="p-6 space-y-5">
-                        <!-- 4 Official TCF Criteria Grid -->
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                                <span class="text-[10px] font-bold uppercase text-slate-400 block">1. Consigne & Longueur</span>
-                                <span id="crit-consigne" class="text-sm font-extrabold text-slate-800 mt-0.5 block">Excellent</span>
-                            </div>
-                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                                <span class="text-[10px] font-bold uppercase text-slate-400 block">2. Cohérence & Plan</span>
-                                <span id="crit-coherence" class="text-sm font-extrabold text-slate-800 mt-0.5 block">Très bien</span>
-                            </div>
-                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                                <span class="text-[10px] font-bold uppercase text-slate-400 block">3. Richesse Lexicale</span>
-                                <span id="crit-lexique" class="text-sm font-extrabold text-slate-800 mt-0.5 block">Niveau B2/C1</span>
-                            </div>
-                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                                <span class="text-[10px] font-bold uppercase text-slate-400 block">4. Grammaire & Syntaxe</span>
-                                <span id="crit-grammaire" class="text-sm font-extrabold text-slate-800 mt-0.5 block">Solide</span>
-                            </div>
-                        </div>
-
-                        <!-- Diagnostic Feedback -->
-                        <div>
-                            <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1.5">
-                                <i class="fa-solid fa-comment-dots text-indigo-600"></i> Diagnostic détaillé (Español / Français)
-                            </h4>
-                            <p id="eval-feedback" class="text-sm text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-200 leading-relaxed"></p>
-                        </div>
-
-                        <!-- Specific Corrections -->
-                        <div>
-                            <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1.5">
-                                <i class="fa-solid fa-highlighter text-red-600"></i> Corrections & Points d'amélioration
-                            </h4>
-                            <ul id="eval-corrections" class="space-y-2 text-sm"></ul>
-                        </div>
-
-                        <!-- Upgraded C1 / NCLC 10 Rewrite -->
-                        <div class="bg-indigo-50/70 border border-indigo-200 rounded-xl p-4">
-                            <div class="flex items-center justify-between mb-2">
-                                <h4 class="text-xs font-extrabold uppercase tracking-wider text-indigo-950 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-wand-magic-sparkles text-indigo-600"></i> Votre texte réécrit au Niveau C1 (NCLC 10)
-                                </h4>
-                                <button onclick="copyC1Rewrite()" class="text-xs bg-white hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-2.5 py-1 rounded-lg font-bold transition flex items-center gap-1">
-                                    <i class="fa-regular fa-copy"></i> Copier
-                                </button>
-                            </div>
-                            <p id="eval-c1-rewrite" class="text-sm text-indigo-950 leading-relaxed italic whitespace-pre-line"></p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Right Column (4 cols): Interactive Methodology Checklist + B2/C1 Connectors Booster -->
-            <div class="lg:col-span-4 space-y-5">
-
-                <!-- Live Methodology Checklist (Réussir TCF Canada Standard) -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
-                        <div>
-                            <h2 class="font-bold text-slate-900 text-sm sm:text-base flex items-center gap-2">
-                                <i class="fa-solid fa-list-check text-red-600"></i> Checklist Méthodologie TCF
-                            </h2>
-                            <p id="checklist-subtitle" class="text-xs text-slate-500 mt-0.5">Structure officielle requise pour la Tâche 1</p>
-                        </div>
-                        <span class="bg-red-50 text-red-700 text-[11px] font-extrabold px-2.5 py-1 rounded-lg">NCLC 7+</span>
-                    </div>
-
-                    <div id="methodology-checklist" class="space-y-2 text-xs"></div>
-                </div>
-
-                <!-- Booster de Connecteurs Logiques B2/C1 -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sticky top-20">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
-                        <div>
-                            <h2 class="font-bold text-slate-900 text-sm sm:text-base flex items-center gap-2">
-                                <i class="fa-solid fa-bolt text-amber-500"></i> Connecteurs C1 (Clic = Insérer)
-                            </h2>
-                            <p class="text-xs text-slate-500 mt-0.5">Indispensables pour atteindre NCLC 9–10</p>
-                        </div>
-                    </div>
-
-                    <!-- Filter Pills -->
-                    <div class="flex flex-wrap gap-1.5 mb-3">
-                        <button onclick="filterConnectors('all')" id="conn-cat-all" class="text-xs px-2.5 py-1 rounded-lg font-bold bg-slate-900 text-white">Tous</button>
-                        <button onclick="filterConnectors('synthese')" id="conn-cat-synthese" class="text-xs px-2.5 py-1 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">Synthèse T3</button>
-                        <button onclick="filterConnectors('ajouter')" id="conn-cat-ajouter" class="text-xs px-2.5 py-1 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">Ajouter</button>
-                        <button onclick="filterConnectors('nuancer')" id="conn-cat-nuancer" class="text-xs px-2.5 py-1 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">Nuancer</button>
-                        <button onclick="filterConnectors('conclure')" id="conn-cat-conclure" class="text-xs px-2.5 py-1 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">Conclure</button>
-                    </div>
-
-                    <!-- Connectors List -->
-                    <div id="connectors-list" class="space-y-2 max-h-[340px] overflow-y-auto pr-1"></div>
-                </div>
-
-            </div>
-
-        </div>
-    </main>
-
-    <!-- ========================================================= -->
-    <!-- MODULE 2: MÉTHODOLOGIE OFFICIELLE & SQUELETTES C1         -->
-    <!-- ========================================================= -->
-    <section id="module-methodologie" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            <!-- Guide Tâche 1 -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="bg-red-100 text-red-800 text-xs font-extrabold px-3 py-1 rounded-full">TÂCHE 1 • 60–120 MOTS</span>
-                        <span class="text-xs font-bold text-slate-400">⏱ 10 minutes</span>
-                    </div>
-                    <h3 class="text-lg font-extrabold text-slate-900 mb-2">Message / Courriel personnel ou formel</h3>
-                    <p class="text-xs text-slate-600 mb-4 leading-relaxed">
-                        L'objectif est de transmettre un message clair (invitation, description d'appartement, renseignements) en respectant toutes les étapes de la consigne.
-                    </p>
-                    <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200 text-xs space-y-2 mb-4">
-                        <div class="font-bold text-slate-800">Les 6 étapes obligatoires :</div>
-                        <p>1. <strong>Objet :</strong> Ex: <em>Objet : Invitation au festival de musique !</em></p>
-                        <p>2. <strong>Salutation :</strong> <em>Salut Léo,</em> (informel) ou <em>Madame, Monsieur,</em> (formel).</p>
-                        <p>3. <strong>Objectif du mail :</strong> <em>Je t'écris ce message pour t'inviter...</em></p>
-                        <p>4. <strong>Détails (Qui/Quoi/Quand/Où) :</strong> Répondre à chaque point demandé.</p>
-                        <p>5. <strong>Attentes :</strong> <em>Dis-moi vite si tu es disponible !</em></p>
-                        <p>6. <strong>Congé :</strong> <em>À très bientôt, / Bien cordialement,</em></p>
-                    </div>
-                </div>
-                <button onclick="useMethodologyTemplate(1)" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition">
-                    Utiliser ce squelette dans le simulateur →
-                </button>
-            </div>
-
-            <!-- Guide Tâche 2 -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="bg-indigo-100 text-indigo-800 text-xs font-extrabold px-3 py-1 rounded-full">TÂCHE 2 • 120–150 MOTS</span>
-                        <span class="text-xs font-bold text-slate-400">⏱ 20 minutes</span>
-                    </div>
-                    <h3 class="text-lg font-extrabold text-slate-900 mb-2">Article de blog / Partage d'expérience</h3>
-                    <p class="text-xs text-slate-600 mb-4 leading-relaxed">
-                        Vous devez raconter une expérience vécue (restaurant, voyage, association, fête) et justifier votre opinion pour capter l'attention des lecteurs.
-                    </p>
-                    <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200 text-xs space-y-2 mb-4">
-                        <div class="font-bold text-slate-800">Structure gagnante NCLC 9+ :</div>
-                        <p>1. <strong>Titre accrocheur :</strong> Ex: <em>Une découverte gastronomique inoubliable !</em></p>
-                        <p>2. <strong>Introduction :</strong> Situer l'événement (Quand, où, avec qui) et interpeller les lecteurs.</p>
-                        <p>3. <strong>Développement :</strong> Décrire l'expérience (passé composé / imparfait) + exprimer ses sentiments (<em>Ce qui m'a le plus marqué, c'est...</em>).</p>
-                        <p>4. <strong>Conclusion & Appel :</strong> Bilan positif + question finale aux lecteurs du blog.</p>
-                    </div>
-                </div>
-                <button onclick="useMethodologyTemplate(2)" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition">
-                    Utiliser ce squelette dans le simulateur →
-                </button>
-            </div>
-
-            <!-- Guide Tâche 3 -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="bg-emerald-100 text-emerald-800 text-xs font-extrabold px-3 py-1 rounded-full">TÂCHE 3 • 120–180 MOTS</span>
-                        <span class="text-xs font-bold text-slate-400">⏱ 30 minutes</span>
-                    </div>
-                    <h3 class="text-lg font-extrabold text-slate-900 mb-2">Synthèse de documents + Essai argumentatif</h3>
-                    <p class="text-xs text-slate-600 mb-4 leading-relaxed">
-                        La tâche décisive pour le niveau C1. Interdiction absolue de copier-coller les phrases des documents : vous devez reformuler avec vos propres mots.
-                    </p>
-                    <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200 text-xs space-y-2 mb-4">
-                        <div class="font-bold text-slate-800">Répartition stricte en 2 parties :</div>
-                        <p>1. <strong>Partie 1 : Synthèse (40 à 60 mots) :</strong> Présenter le thème commun. <em>D'une part, le premier document souligne... D'autre part, le second texte met en garde contre...</em></p>
-                        <p>2. <strong>Partie 2 : Opinion (80 à 120 mots) :</strong> Prendre position avec nuance (<em>Pour ma part, j'estime que... Certes... Toutefois...</em>) + un exemple concret + phrase de conclusion (<em>En définitive...</em>).</p>
-                    </div>
-                </div>
-                <button onclick="useMethodologyTemplate(3)" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition">
-                    Utiliser ce squelette dans le simulateur →
-                </button>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- ========================================================= -->
-    <!-- MODULE 3: QUIZ CONNECTEURS & REFORMULATION NCLC 9+        -->
-    <!-- ========================================================= -->
-    <section id="module-entrainement" class="hidden flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-            <div class="flex items-center justify-between mb-4">
-                <span class="bg-red-100 text-red-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase">
-                    Entraînement Intensif C1
-                </span>
-                <span class="text-xs font-bold text-slate-500">
-                    Score : <strong class="text-indigo-600" id="quiz-score">0</strong> / <span id="quiz-total">6</span>
-                </span>
-            </div>
-
-            <h2 class="text-xl font-extrabold text-slate-900 mb-1">Remplacez les mots basiques (A2/B1) par des structures NCLC 9–10</h2>
-            <p class="text-xs sm:text-sm text-slate-500 mb-6">
-                Pour obtenir NCLC 9 ou 10 au TCF Canada, évitez les répétitions de « mais », « parce que » ou « aussi ».
-            </p>
-
-            <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200 mb-5">
-                <div class="text-xs font-bold text-red-600 mb-2 flex items-center gap-1.5">
-                    <i class="fa-solid fa-ban"></i> Mot basique à remplacer : <span id="quiz-basic-word" class="underline"></span>
-                </div>
-                <p id="quiz-sentence" class="text-base sm:text-lg font-semibold text-slate-800 leading-relaxed mb-2"></p>
-                <p id="quiz-translation" class="text-xs text-slate-500 italic mb-5"></p>
-
-                <div id="quiz-options" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
-                <div id="quiz-feedback" class="hidden mt-4 p-3.5 rounded-xl text-xs sm:text-sm font-medium"></div>
-            </div>
-
-            <div class="flex items-center justify-between">
-                <button onclick="prevQuizQuestion()" class="px-4 py-2 rounded-xl border border-slate-300 text-xs font-bold text-slate-600 hover:bg-slate-100 transition">
-                    ← Question précédente
-                </button>
-                <span id="quiz-progress-text" class="text-xs font-bold text-slate-400">Question 1 sur 6</span>
-                <button onclick="nextQuizQuestion()" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition">
-                    Question suivante →
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <!-- ========================================================= -->
-    <!-- MODAL: IMPORTER / GÉNÉRER UNE NOUVELLE COMBINAISON        -->
-    <!-- ========================================================= -->
-    <div id="import-modal" class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 hidden items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-slate-200 my-8">
-            <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 px-6 py-4 text-white flex items-center justify-between">
-                <div>
-                    <span class="text-[10px] font-extrabold uppercase tracking-wider bg-indigo-500/30 text-indigo-200 px-2.5 py-0.5 rounded-full">Base de données évolutive</span>
-                    <h3 class="text-lg font-extrabold mt-1">Ajouter ou Générer une Combinaison TCF Canada</h3>
-                </div>
-                <button onclick="closeImportModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
-                <!-- Option A: 1-Click AI Generator -->
-                <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-4">
-                    <div class="flex flex-wrap items-center justify-between gap-3">
-                        <div>
-                            <h4 class="font-bold text-sm text-indigo-950 flex items-center gap-1.5">
-                                <i class="fa-solid fa-wand-magic-sparkles text-indigo-600"></i> Option 1 : Générer automatiquement avec l'IA
-                            </h4>
-                            <p class="text-xs text-indigo-700 mt-0.5">Indiquez un thème (ex: Écologie, Logement au Canada, Télétravail) et l'IA crée les 3 tâches + corrigés C1.</p>
-                        </div>
-                        <div class="flex items-center gap-2 w-full sm:w-auto">
-                            <input id="ai-topic-input" type="text" placeholder="Ex: L'immigration au Canada, Sport..." class="flex-1 sm:w-56 text-xs px-3 py-2 rounded-xl border border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <button onclick="generateCombinaisonWithAI()" id="btn-gen-ai" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow transition whitespace-nowrap">
-                                ✨ Générer
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Option B: Manual Copy-Paste from reussir-tcfcanada.com -->
-                <div class="space-y-3 pt-2">
-                    <h4 class="font-bold text-sm text-slate-800 flex items-center gap-1.5">
-                        <i class="fa-solid fa-paste text-red-600"></i> Option 2 : Coller un sujet de reussir-tcfcanada.com
-                    </h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                            <label class="text-xs font-bold text-slate-600 block mb-1">Mois / Catégorie</label>
-                            <input id="imp-month" type="text" value="Importés / IA" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300">
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold text-slate-600 block mb-1">Nom de la Combinaison</label>
-                            <input id="imp-title" type="text" placeholder="Ex: Novembre 2026 — Combinaison 1" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="text-xs font-bold text-slate-600 block mb-1">Consigne Tâche 1 (60-120 mots)</label>
-                        <textarea id="imp-t1" rows="2" placeholder="Collez la consigne de la Tâche 1 ici..." class="w-full text-xs p-2.5 rounded-xl border border-slate-300"></textarea>
-                    </div>
-
-                    <div>
-                        <label class="text-xs font-bold text-slate-600 block mb-1">Consigne Tâche 2 (120-150 mots)</label>
-                        <textarea id="imp-t2" rows="2" placeholder="Collez la consigne de la Tâche 2 ici..." class="w-full text-xs p-2.5 rounded-xl border border-slate-300"></textarea>
-                    </div>
-
-                    <div>
-                        <label class="text-xs font-bold text-slate-600 block mb-1">Sujet / Consigne Tâche 3 (120-180 mots)</label>
-                        <input id="imp-t3-prompt" type="text" placeholder="Ex: Les transports gratuits en ville" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 mb-2">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            <textarea id="imp-t3-doc1" rows="3" placeholder="Collez le Document 1 ici..." class="w-full text-xs p-2.5 rounded-xl border border-slate-300"></textarea>
-                            <textarea id="imp-t3-doc2" rows="3" placeholder="Collez le Document 2 ici..." class="w-full text-xs p-2.5 rounded-xl border border-slate-300"></textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-200">
-                    <button onclick="closeImportModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-xs font-bold text-slate-600 hover:bg-slate-100">
-                        Annuler
-                    </button>
-                    <button onclick="saveImportedCombinaison()" class="px-5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow">
-                        Enregistrer la Combinaison
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 mt-12 py-4">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap justify-between items-center text-xs text-slate-400 gap-2">
-            <span>Réussir TCF Canada — Studio d'Expression Écrite (Sujets d'Actualité 2026)</span>
-            <span>Entraînement interactif NCLC 7 / 9 / 10+ • Sauvegarde locale automatique</span>
-        </div>
-    </footer>
-
-    <!-- ========================================================= -->
-    <!-- APPLICATION DATA & LOGIC                                  -->
-    <!-- ========================================================= -->
-    <script>
-        // 1. OFFICIAL 2026 COMBINAISONS FROM REUSSIR-TCFCANADA.COM
-        const defaultCombinaisons = [
-            {
-                id: "oct26-c1",
-                month: "Octobre 2026",
-                title: "Octobre 2026 — Combinaison 1 (Festival musical, Restaurant, Lecture enfants)",
-                tasks: {
-                    1: {
-                        min: 60, max: 120,
-                        prompt: "Vous envoyez une lettre à votre ami pour l'inviter à participer à un festival musical organisé dans votre ville. Vous lui précisez les détails essentiels (la date, le lieu, les artistes invités, etc.).",
-                        model: "Objet : Invitation au Festival d'Été de Montréal !\n\nSalut Maxime,\n\nJ'espère que tu vas bien ! Je t'écris ce message pour t'inviter au grand festival musical qui aura lieu dans ma ville le week-end prochain, du 14 au 16 novembre.\n\nLes concerts se dérouleront en plein air sur la place des Festivals, dès 18 heures. Cette année, plusieurs artistes francophones très connus comme Stromae et Angèle sont invités ! L'ambiance promet d'être électrique et les billets sont très abordables.\n\nEs-tu libre samedi soir pour y aller avec moi ? Tu peux dormir à la maison si tu veux. Dis-moi vite si cela te tente !\n\nÀ très bientôt,\nThomas"
-                    },
-                    2: {
-                        min: 120, max: 150,
-                        prompt: "Sur votre blog, racontez votre dernière expérience dans un restaurant (le lieu, les plats, le service, etc.). Décrivez votre expérience et expliquez ce qui vous a particulièrement plu.",
-                        model: "Une escale gourmande inoubliable au cœur du Vieux-Port !\n\nAmis gourmets, samedi dernier, j'ai découvert un petit restaurant bistronomique baptisé « L'Atelier des Saveurs », situé dans une ruelle charmante du centre-ville, et je tenais absolument à partager cette adresse avec vous.\n\nDès mon arrivée, j'ai été séduit par la décoration chaleureuse aux lumières tamisées. J'ai commandé un filet de saumon rôti à l'érable accompagné de légumes croquants, suivi d'un fondant au chocolat maison. Ce qui m'a particulièrement plu, c'est la fraîcheur exceptionnelle des produits locaux ainsi que l'accueil souriant des serveurs, qui ont pris le temps de nous conseiller avec passion.\n\nEn somme, le rapport qualité-prix est remarquable. Je vous recommande vivement de réserver une table, vous ne serez pas déçus ! Et vous, quelle est votre meilleure découverte culinaire du mois ?"
-                    },
-                    3: {
-                        min: 120, max: 180,
-                        prompt: "La lecture chez les enfants : obligation ou plaisir partagé ? À partir des deux documents suivants, résumez les deux points de vue (40-60 mots) puis donnez votre opinion personnelle argumentée (80-120 mots).",
-                        doc1: "« Forcer un enfant à lire est souvent contre-productif. Lorsque la lecture est perçue comme une corvée scolaire supplémentaire après une longue journée, elle provoque du rejet. Beaucoup d'experts estiment que les jeunes développent leur curiosité autrement aujourd'hui, notamment grâce aux supports visuels et interactifs. »",
-                        doc2: "« Lire avec ses enfants est une activité agréable et bénéfique. Elle contribue au développement des enfants, car une lecture régulière leur permet d'apprendre de nouveaux mots et à mieux écouter. Cinq à dix minutes par jour suffisent aux parents pour partager du plaisir en famille et leur donner le goût de la lecture durablement. »",
-                        model: "Ces deux documents abordent la question de l'apprentissage de la lecture chez les jeunes. D'une part, le premier texte affirme que contraindre un enfant à lire s'avère contre-productif et suscite du rejet. D'autre part, le second document souligne que la lecture partagée en famille enrichit le vocabulaire et développe l'écoute en quelques minutes quotidiennes.\n\nPour ma part, je suis convaincu que la lecture demeure irremplaçable, à condition qu'elle ne soit jamais imposée comme une punition. En effet, instaurer un rituel de lecture de dix minutes chaque soir avec les parents crée un lien affectif fort tout en stimulant l'imaginaire de l'enfant. Toutefois, il convient de laisser les jeunes choisir des sujets qui les passionnent, comme des bandes dessinées ou des contes illustrés.\n\nEn définitive, c'est par le plaisir partagé et l'exemple parental que l'on cultive durablement l'amour des livres."
-                    }
-                }
-            },
-            {
-                id: "oct26-c8",
-                month: "Octobre 2026",
-                title: "Octobre 2026 — Combinaison 8 (Prêt de logement, Souvenir de voyage, Langues en ligne)",
-                tasks: {
-                    1: {
-                        min: 60, max: 120,
-                        prompt: "Vous devez partir en voyage et votre ami(e) va rester chez vous pendant votre absence. Vous lui envoyez un message pour lui expliquer comment est votre logement et lui donner les renseignements utiles (bâtiment, appartement, accès, règles, etc.).",
-                        model: "Objet : Toutes les infos pour ton séjour dans mon appartement\n\nSalut Claire,\n\nJe suis ravi de te prêter mon appartement pendant mes vacances la semaine prochaine ! Voici quelques renseignements pratiques pour ton arrivée.\n\nL'immeuble se situe au 24 rue Victor-Hugo ; le code de la porte d'entrée est le 4589B et mon logement se trouve au deuxième étage à gauche. J'ai laissé le double des clés chez ma voisine Mme Dupont, au rez-de-chaussée. L'appartement est spacieux avec une cuisine équipée et un balcon.\n\nJe te demande simplement d'arroser mes plantes vertes mercredi et de ne pas faire de bruit après 22 heures pour respecter le règlement de la copropriété.\n\nN'hésite pas à m'appeler si tu as la moindre question. Bon séjour !\n\nLucas"
-                    },
-                    2: {
-                        min: 120, max: 150,
-                        prompt: "Vous publiez sur votre blog un article consacré à votre meilleur souvenir de voyage. Vous décrivez ce moment et précisez les raisons pour lesquelles il vous a particulièrement marqué(e).",
-                        model: "Le jour où j'ai admiré les baleines à Tadoussac : un souvenir magique !\n\nChers lecteurs, parmi toutes mes escapades, mon excursion à Tadoussac, au Québec, l'été dernier demeure sans aucun doute le souvenir de voyage le plus émouvant de ma vie.\n\nCe matin-là, nous avions embarqué à bord d'un petit zodiac sous une brume légère. Soudain, à quelques mètres de nous, une immense baleine bleue a surgi des eaux glacées du fleuve Saint-Laurent. Ce moment m'a profondément marqué non seulement par la beauté sauvage du paysage, mais surtout parce que j'ai ressenti une connexion unique et humble face à la grandeur de la nature.\n\nEn conclusion, cette rencontre inattendue a changé mon regard sur la préservation des océans. Je vous conseille vivement de vivre cette aventure au moins une fois !"
-                    },
-                    3: {
-                        min: 120, max: 180,
-                        prompt: "Apprendre une langue étrangère en ligne vs en présentiel. Résumez les deux points de vue (40-60 mots) puis exprimez votre opinion personnelle argumentée (80-120 mots).",
-                        doc1: "« Grâce à Internet, il est tout à fait possible d'apprendre une langue en ligne, et les résultats sont souvent très bons ! Contrairement aux cours en présentiel, on peut suivre les leçons quand on le souhaite, puisqu'elles sont disponibles 24h/24. Cela aide à mieux gérer son emploi du temps. »",
-                        doc2: "« Rien ne remplace une salle de classe traditionnelle pour maîtriser une langue. L'interaction directe avec le professeur et les autres étudiants favorise la spontanéité orale, corrige immédiatement la prononciation et évite le sentiment d'isolement qui pousse beaucoup d'apprenants en ligne à abandonner. »",
-                        model: "Ces deux textes débattent de l'efficacité de l'apprentissage d'une langue en ligne par rapport au présentiel. Tandis que le premier document vante la flexibilité horaire et l'autonomie offertes par les cours numériques, le second soutient que la classe traditionnelle reste indispensable pour pratiquer l'oral spontanément et maintenir la motivation.\n\nÀ mon avis, ces deux méthodes ne s'opposent pas mais se complètent admirablement. Certes, les plateformes en ligne constituent un atout précieux pour réviser la grammaire et le vocabulaire à son propre rythme après le travail. Néanmoins, force est de constater qu'une langue vivante nécessite de véritables échanges humains pour vaincre la timidité et perfectionner son accent.\n\nEn somme, l'idéal consiste à combiner des outils numériques quotidiens avec des ateliers de conversation en présentiel."
-                    }
-                }
-            },
-            {
-                id: "oct26-c15",
-                month: "Octobre 2026",
-                title: "Octobre 2026 — Combinaison 15 (Dîner de départ collègues, Formations en ligne, Valeur du travail)",
-                tasks: {
-                    1: {
-                        min: 60, max: 120,
-                        prompt: "Vous arrivez à la fin de votre séjour professionnel à l'étranger et voulez célébrer votre départ. Vous envoyez un courriel à vos collègues pour les inviter à dîner au restaurant. Vous expliquez votre projet et précisez les détails pratiques (lieu, date, heure, etc.).",
-                        model: "Objet : Invitation à mon dîner de départ — Vendredi 30 octobre\n\nChers collègues,\n\nComme vous le savez, ma mission au sein de notre filiale à Toronto touche à sa fin cette semaine. Avant de rentrer dans mon pays, je tiens à vous remercier pour votre accueil chaleureux en vous invitant à partager un dîner convivial.\n\nJe vous donne donc rendez-vous ce vendredi 30 octobre à 19 h 30 au restaurant « La Belle Époque », situé à cinq minutes à pied de nos bureaux. J'ai réservé une grande table au calme pour que nous puissions célébrer ces beaux mois de collaboration.\n\nPourriez-vous me confirmer votre présence d'ici mercredi soir afin que je valide la réservation ?\n\nBien amicalement,\nMarc"
-                    },
-                    2: {
-                        min: 120, max: 150,
-                        prompt: "Vous avez consulté une discussion sur Internet à propos des formations en ligne. Rédigez un message pour partager votre expérience personnelle (cours de langue, formation professionnelle, etc.) et exprimer ce que vous avez aimé et moins apprécié.",
-                        model: "Mon bilan honnête après six mois de formation professionnelle en ligne !\n\nBonjour à tous les membres du forum, ayant suivi récemment un certificat en gestion de projet entièrement à distance, je souhaite vous faire part de mon retour d'expérience.\n\nD'un côté, j'ai énormément apprécié la souplesse de ce format : je pouvais visionner les capsules vidéo le soir à mon rythme et éviter les embouteillages quotidiens. Les supports numériques interactifs étaient également très bien conçus.\n\nCependant, j'ai moins aimé le manque de contact direct avec les formateurs. Lors des travaux de groupe à distance, il était parfois difficile de se coordonner, et l'absence de discussions informelles m'a pesé.\n\nBref, je recommande les formations en ligne aux personnes autonomes, mais privilégiez les programmes incluant des séances en direct !"
-                    },
-                    3: {
-                        min: 120, max: 180,
-                        prompt: "Le travail : fardeau ou source d'épanouissement ? Résumez les deux documents (40-60 mots) et développez votre opinion argumentée (80-120 mots).",
-                        doc1: "« Le travail occupe une place centrale dans notre vie : dès l'enfance, on nous demande ce que l'on veut devenir. Au-delà du salaire, exercer un métier permet de tisser des liens sociaux, de se sentir utile à la collectivité et de structurer son quotidien. »",
-                        doc2: "« Pour un nombre croissant de salariés, le travail est devenu une source d'épuisement et de stress permanent. Entre la pression des résultats et les horaires à rallonge, beaucoup estiment que le travail empiète sur leur vie familiale et rêvent de réduire leur temps d'activité. »",
-                        model: "Ces deux documents présentent deux visions contrastées du travail dans notre société. D'une part, le premier texte met en avant son rôle essentiel d'intégration sociale, d'utilité collective et d'épanouissement identitaire. D'autre part, le second document dénonce la pression professionnelle qui engendre du stress et nuit à l'équilibre familial.\n\nPersonnellement, j'estime que le travail reste un pilier fondamental de réalisation de soi, pourvu que les conditions d'exercice respectent la santé mentale des employés. En effet, accomplir des projets stimulants procure une fierté légitime. Toutefois, l'hyperconnexion actuelle brouille dangereusement la frontière entre vie privée et obligations professionnelles.\n\nEn définitive, les entreprises doivent promouvoir la flexibilité et le droit à la déconnexion afin que le travail demeure une source d'épanouissement et non d'aliénation."
-                    }
-                }
-            },
-            {
-                id: "sep26-c9",
-                month: "Septembre 2026",
-                title: "Septembre 2026 — Combinaison 9 (Nouvel appartement Léo, Bénévolat aînés, Jeux vidéo)",
-                tasks: {
-                    1: {
-                        min: 60, max: 120,
-                        prompt: "Vous avez déménagé dans une nouvelle ville il y a un mois. Rédigez un courriel à votre ami Léo pour lui donner de vos nouvelles. Dans votre message, décrivez votre appartement, le quartier, la ville, ainsi que les activités que vous avez découvertes.",
-                        model: "Objet : Mes nouvelles depuis Québec !\n\nSalut Léo,\n\nJ'espère que tout va bien de ton côté ! Cela fait maintenant un mois que j'ai emménagé à Québec et je t'écris enfin pour te donner de mes nouvelles.\n\nMon nouvel appartement est lumineux, avec un grand salon et une vue superbe sur le fleuve. Il se trouve dans le quartier Montcalm, un secteur très verdoyant, calme et proche des commerces. La ville est magnifique, à la fois historique et dynamique. Depuis mon arrivée, je me suis inscrit dans un club de randonnée et j'ai découvert le patinage ! \n\nQuand viens-tu me rendre visite pour découvrir tout cela ? Donnes-moi vite tes disponibilités !\n\nAmitiés,\njulien"
-                    },
-                    2: {
-                        min: 120, max: 150,
-                        prompt: "Vous faites partie d'une association qui soutient les personnes âgées. Écrivez un article pour un blog afin de raconter votre expérience et motiver d'autres personnes à s'engager.",
-                        model: "Pourquoi le bénévolat auprès des aînés a transformé mes week-ends !\n\nDepuis six mois, je suis bénévole au sein de l'association « Sourires Partagés », qui accompagne les personnes âgées isolées de notre ville, et je souhaitais vous raconter cette aventure humaine extraordinaire.\n\nChaque samedi après-midi, je rends visite à Madeleine, une ancienne institutrice de 84 ans, pour jouer aux cartes, l'aider avec ses courses ou simplement écouter ses récits fascinants. Ce qui m'apporte une joie immense, c'est de voir son visage s'illuminer dès mon arrivée et de recevoir en retour une sagesse de vie inestimable.\n\nEn somme, offrir deux heures par semaine suffit à briser la solitude de nos aînés. Rejoignez notre équipe dès aujourd'hui : votre présence fera toute la différence !"
-                    },
-                    3: {
-                        min: 120, max: 180,
-                        prompt: "Les jeux vidéo chez les adultes et les jeunes. Résumez les deux points de vue (40-60 mots) puis donnez votre avis personnel argumenté (80-120 mots).",
-                        doc1: "« Jouer aux jeux vidéo peut être très bénéfique, car cela aide à renforcer la capacité d'analyse, la prise de décision et la rapidité de réaction. C'est une bonne nouvelle, puisque 83 % des joueurs sont aujourd'hui des adultes qui utilisent ce média pour décompresser. »",
-                        doc2: "« L'abus des écrans et des jeux vidéo est une préoccupation majeure pour les parents. Cela ne mène à aucun jeu libre créatif ni à aucune interaction sociale face à face, tout en réduisant considérablement l'activité physique quotidienne des jeunes. »",
-                        model: "Ces deux textes s'opposent sur les effets de la pratique des jeux vidéo. Tandis que le premier document souligne leurs bienfaits cognitifs sur la réactivité et la détente chez une majorité d'adultes, le second déplore l'isolement social et la sédentarité qu'ils entraînent chez les jeunes.\n\nPour ma part, je considère que le jeu vidéo est un loisir culturel enrichissant lorsqu'il est pratiqué avec modération. Certes, les jeux de stratégie stimulent la réflexion et permettent de relâcher la pression quotidienne. Néanmoins, chez les enfants et adolescents, un usage non encadré nuit gravement au sommeil et aux activités sportives en plein air.\n\nEn conclusion, il appartient aux parents de fixer des limites horaires strictes afin de préserver un juste équilibre entre divertissement virtuel et vie réelle."
-                    }
-                }
-            },
-            {
-                id: "aout26-c4",
-                month: "Août 2026",
-                title: "Août 2026 — Combinaison 4 (Transports pour Anna, Fête des voisins, Distributeurs à l'école)",
-                tasks: {
-                    1: {
-                        min: 60, max: 120,
-                        prompt: "Votre amie Anna prévoit de passer un week-end dans votre ville et souhaite en savoir plus sur les moyens de transport disponibles pour visiter les environs. Rédigez-lui un message en détaillant les différentes options (bus, métro, vélo, tarifs, etc.).",
-                        model: "Objet : Conseils de transport pour ton week-end à Lyon !\n\nSalut Anna,\n\nQuelle excellente nouvelle que tu viennes passer le week-end ici ! Pour te déplacer facilement en ville et dans les environs, plusieurs options très pratiques s'offrent à toi.\n\nTout d'abord, le réseau de métro et de tramway est rapide et fonctionne jusqu'à minuit. Je te conseille d'acheter le pass week-end illimité à 12 euros, qui inclut même les bus vers les villages voisins. Par ailleurs, s'il fait beau, tu peux louer un vélo électrique en libre-service pour seulement 4 euros la journée afin de longer les quais.\n\nDis-moi à quelle heure arrive ton train vendredi pour que je vienne te chercher à la gare !\n\nBises,\nCamille"
-                    },
-                    2: {
-                        min: 120, max: 150,
-                        prompt: "Vous avez récemment assisté à une fête de quartier entre voisins. Sur votre blog, racontez votre expérience et expliquez pourquoi vous avez aimé cet événement.",
-                        model: "La Fête des Voisins : une soirée mémorable qui rapproche tout un quartier !\n\nVendredi dernier, j'ai participé pour la première fois à la fête annuelle de mon quartier, organisée dans la cour fleurie de notre résidence, et je garde un souvenir merveilleux de cette soirée.\n\nChacun avait préparé une spécialité culinaire de sa région ou de son pays d'origine, pendant que des musiciens amateurs animaient la soirée à la guitare. Ce que j'ai particulièrement adoré, c'est la spontanéité des échanges : en quelques heures, des visages que je croisais timidement dans l'ascenseur sont devenus de véritables amis prêts à s'entraider au quotidien.\n\nEn définitive, cet événement prouve que la convivialité existe encore en ville. Je vous encourage vivement à organiser une telle rencontre chez vous !"
-                    },
-                    3: {
-                        min: 120, max: 180,
-                        prompt: "Les distributeurs automatiques dans les écoles. Faites la synthèse des deux documents (40-60 mots) et exprimez votre opinion argumentée (80-120 mots).",
-                        doc1: "« Les distributeurs automatiques dans les lycées permettent aux élèves d'avoir un accès rapide à des boissons et en-cas, notamment lorsqu'ils n'ont pas le temps de passer à la cantine. De plus, ils peuvent être approvisionnés en options saines comme de l'eau et des fruits. »",
-                        doc2: "« La présence de distributeurs dans les établissements scolaires encourage le grignotage permanent et la consommation de produits ultra-transformés. Les nutritionnistes rappellent que cette habitude favorise le surpoids et nuit à la concentration en classe. »",
-                        model: "Ces deux documents débattent de la présence des distributeurs automatiques en milieu scolaire. D'un côté, le premier texte affirme qu'ils offrent un service pratique aux lycéens pressés et peuvent proposer des collations saines. De l'autre, le second document dénonce l'incitation au grignotage et les risques d'obésité liés aux produits sucrés.\n\nÀ mon sens, au lieu d'interdire purement ces appareils, il est préférable d'en réglementer strictement le contenu. En effet, les adolescents ont souvent besoin d'un regain d'énergie durant de longues journées d'études. Toutefois, l'école a une mission éducative de santé publique et ne doit pas exposer les jeunes à la malbouffe.\n\nEn définitive, remplacer les sodas et confiseries par des fruits frais, des oléagineux et de l'eau constitue le compromis idéal."
-                    }
-                }
-            }
-        ];
-
-        // 2. METHODOLOGY CHECKLISTS PER TASK (REUSSIR TCF CANADA)
-        const methodologyChecklists = {
-            1: [
-                { id: "c1-objet", label: "Objet du courriel / message en haut", regex: /(objet\s*:|sujet\s*:)/i },
-                { id: "c1-salut", label: "Salutation adaptée (Salut..., Chers...,Bonjour...)", regex: /(salut|bonjour|cher|chère|chers|madame|monsieur|coucou)/i },
-                { id: "c1-but", label: "Objectif clair du message dès le 1er paragraphe", regex: /(je t'écris|je vous écris|pour t'inviter|pour vous inviter|pour te donner|pour t'expliquer|nouvelles)/i },
-                { id: "c1-details", label: "Détails concrets (Date, lieu, heure, description)", regex: /(heure|samedi|dimanche|vendredi|rue|place|étage|euros|tarif|quartier)/i },
-                { id: "c1-attente", label: "Attente / Question finale au destinataire", regex: /(\?|dis-moi|confirmer|tiens-moi|n'hésite pas|quand viens-tu)/i },
-                { id: "c1-conge", label: "Formule de congé + Prénom à la fin", regex: /(bientôt|amitiés|cordialement|bises|amicalement|bon séjour)/i }
-            ],
-            2: [
-                { id: "c2-titre", label: "Titre accrocheur d'article de blog en haut", regex: /^.{10,85}[!?:]\s*\n/m },
-                { id: "c2-interp", label: "Adresse aux lecteurs / Introduction du contexte", regex: /(lecteurs|amis|récemment|dernier|dernière|il y a|partager|découvert)/i },
-                { id: "c2-recit", label: "Description détaillée de l'expérience vécue", regex: /(j'ai|nous avons|était|avait|ambiance|service|plats|visite)/i },
-                { id: "c2-ressenti", label: "Sentiments & Raisons d'appréciation", regex: /(plu|marqué|adoré|séduit|apprécié|joie|émouvant|exceptionnel)/i },
-                { id: "c2-reco", label: "Conclusion & Recommandation vive aux lecteurs", regex: /(recommande|conseille|en somme|en conclusion|bref|rejoignez|et vous)/i }
-            ],
-            3: [
-                { id: "c3-intro", label: "Phrase d'introduction du sujet des 2 documents", regex: /(deux documents|deux textes|abordent|débattent|s'opposent|présentent)/i },
-                { id: "c3-synthese", label: "Opposition claire Doc 1 vs Doc 2 (D'une part / D'autre part)", regex: /(d'une part|premier|tandis que|d'un côté).*(d'autre part|second|deuxième|de l'autre)/is },
-                { id: "c3-opinion", label: "Prise de position personnelle (Pour ma part / À mon avis)", regex: /(pour ma part|à mon avis|personnellement|j'estime que|je considère que|à mon sens)/i },
-                { id: "c3-nuance", label: "Connecteurs de nuance C1 (Certes, Toutefois, Néanmoins)", regex: /(certes|toutefois|néanmoins|cependant|en effet|force est de constater)/i },
-                { id: "c3-concl", label: "Conclusion synthétique (En définitive, En somme, En conclusion)", regex: /(en définitive|en somme|en conclusion|pour conclure|tout bien considéré)/i }
-            ]
-        };
-
-        // 3. CONNECTORS DATA
-        const connectorsData = [
-            { fr: "Ces deux documents abordent la question de", es: "Estos dos documentos abordan la cuestión de (Intro T3)", cat: "synthese", level: "C1" },
-            { fr: "D'une part, le premier texte souligne que...", es: "Por una parte, el primer texto subraya que...", cat: "synthese", level: "B2" },
-            { fr: "D'autre part, le second document met en garde contre", es: "Por otra parte, el 2º doc advierte contra...", cat: "synthese", level: "C1" },
-            { fr: "Pour ma part, je suis convaincu(e) que", es: "Por mi parte, estoy convencido(a) de que", cat: "synthese", level: "C1" },
-            { fr: "En outre,", es: "Además, / Asimismo,", cat: "ajouter", level: "C1" },
-            { fr: "Par ailleurs,", es: "Por otra parte, / Además,", cat: "ajouter", level: "B2" },
-            { fr: "De surcroît,", es: "Por añadidura, / Además (muy formal),", cat: "ajouter", level: "C1" },
-            { fr: "Certes,... Néanmoins,...", es: "Ciertamente,... Sin embargo,...", cat: "nuancer", level: "C1" },
-            { fr: "Toutefois, il convient de noter que", es: "No obstante, cabe señalar que", cat: "nuancer", level: "C1" },
-            { fr: "Force est de constater que", es: "Es forzoso constatar que / Está claro que", cat: "nuancer", level: "C1" },
-            { fr: "À condition que (+ subjonctif)", es: "A condición de que (+ subjuntivo)", cat: "nuancer", level: "C1" },
-            { fr: "En définitive,", es: "En definitiva, / En conclusión,", cat: "conclure", level: "C1" },
-            { fr: "En somme,", es: "En suma, / En resumen,", cat: "conclure", level: "B2" },
-            { fr: "Par conséquent,", es: "Por consiguiente,", cat: "conclure", level: "B2" }
-        ];
-
-        // 4. SKELETON TEMPLATES
-        const taskSkeletons = {
-            1: `Objet : [Sujet court de votre message]\n\nSalut [Prénom],\n\nJ'espère que tu vas bien ! Je t'écris ce message pour [expliquer l'objectif principal : t'inviter / te donner de mes nouvelles / t'expliquer].\n\nEn effet, [donner les détails : date, lieu, description de l'appartement ou du festival]. Par ailleurs, [ajouter une information pratique : horaires, tarifs, règles ou artistes].\n\nEs-tu disponible pour [proposer une action concrète] ? Dis-moi vite si cela te convient !\n\nÀ très bientôt,\n[Ton Prénom]`,
-            2: `[Titre accrocheur de votre article de blog] !\n\nChers lecteurs, récemment, j'ai eu l'occasion de vivre une expérience formidable : [préciser le lieu, l'événement ou l'association], et je tenais absolument à la partager avec vous.\n\nDès le début, j'ai été séduit(e) par [décrire l'ambiance, les activités ou les plats]. Ce qui m'a particulièrement marqué(e), c'est [expliquer pourquoi vous avez aimé + émotion ressentie].\n\nEn somme, je vous recommande vivement de tenter cette aventure, vous ne le regretterez pas ! Et vous, qu'en pensez-vous ?`,
-            3: `Ces deux documents abordent la question controversée de [thème général]. D'une part, le premier texte souligne que [reformuler l'idée du Document 1 sans copier]. D'autre part, le second document met en garde contre [reformuler l'idée du Document 2].\n\nPour ma part, je considère que ce sujet nécessite une approche équilibrée. Certes, il est indéniable que [argument 1 + exemple concret]. Toutefois, force est de constater que [argument 2 nuançant la position].\n\nEn définitive, il convient de [proposer une solution ou un juste milieu] afin de concilier ces deux impératifs.`
-        };
-
-        // 5. QUIZ QUESTIONS
-        const quizQuestions = [
-            {
-                basicWord: "mais (pero)",
-                sentence: "Les cours en ligne offrent une grande souplesse, ______ ils peuvent parfois créer un sentiment de solitude.",
-                translation: "Los cursos en línea ofrecen gran flexibilidad, sin embargo a veces pueden crear soledad.",
-                options: ["néanmoins", "par conséquent", "en outre", "puisque"],
-                correct: 0,
-                explanation: "« Néanmoins » ou « Toutefois » remplacent avantageusement « mais » et rapportent immédiatement des points de cohésion NCLC 9+."
-            },
-            {
-                basicWord: "aussi (también / además)",
-                sentence: "La lecture régulière enrichit le vocabulaire des enfants. ______, elle renforce leur capacité d'écoute.",
-                translation: "La lectura regular enriquece el vocabulario. Además, refuerza su capacidad de escucha.",
-                options: ["En revanche", "En outre", "Malgré", "Or"],
-                correct: 1,
-                explanation: "« En outre » ou « De surcroît » sont des connecteurs d'addition de niveau C1 très appréciés dans les Tâches 2 et 3."
-            },
-            {
-                basicWord: "parce que (porque / ya que)",
-                sentence: "______ les loyers sont élevés en centre-ville, beaucoup de jeunes choisissent la colocation.",
-                translation: "Dado que los alquileres son altos en el centro, muchos jóvenes eligen compartir piso.",
-                options: ["En somme", "Toutefois", "Étant donné que", "Certes"],
-                correct: 2,
-                explanation: "Placer « Étant donné que » en tête de phrase montre une maîtrise syntaxique de niveau B2+/C1."
-            },
-            {
-                basicWord: "il est clair que (está claro que)",
-                sentence: "______ le télétravail a profondément transformé l'organisation des entreprises.",
-                translation: "Es forzoso constatar que el teletrabajo ha transformado profundamente las empresas.",
-                options: ["Force est de constater que", "En guise de conclusion", "À condition que", "De peur que"],
-                correct: 0,
-                explanation: "« Force est de constater que » est une expression idiomatique C1 emblématique des corrigés NCLC 10."
-            },
-            {
-                basicWord: "pour finir (para terminar)",
-                sentence: "______, instaurer un dialogue familial demeure la meilleure solution face aux écrans.",
-                translation: "En definitiva, instaurar un diálogo familiar sigue siendo la mejor solución frente a las pantallas.",
-                options: ["D'une part", "En définitive", "Or", "Grâce à"],
-                correct: 1,
-                explanation: "« En définitive » ou « Tout bien considéré » concluent brillamment la Tâche 3."
-            },
-            {
-                basicWord: "même si (aunque + subjuntivo)",
-                sentence: "______ les distributeurs soient pratiques, il faut réglementer les produits proposés.",
-                translation: "Aunque las máquinas expendedoras sean prácticas, hay que regular los productos.",
-                options: ["Bien que", "Parce que", "Pendant que", "Alors que"],
-                correct: 0,
-                explanation: "Utiliser « Bien que » suivi du subjonctif (« soient ») garantit des points sur le critère de compétence grammaticale C1."
-            }
-        ];
-
-        // STATE VARIABLES
-        let combinaisons = [];
-        let currentMonthFilter = "ALL";
-        let currentCombinaisonId = "oct26-c1";
-        let currentTask = 1;
-        let userDrafts = {}; // key: `${combinaisonId}-${taskNum}`
-        let timerSeconds = 60 * 60;
-        let timerInterval = null;
-        let isTimerRunning = false;
-        let currentConnectorFilter = "all";
-        let currentQuizIndex = 0;
-        let quizScore = 0;
-        let answeredQuestions = {};
-
-        // INITIALIZATION
-        window.onload = function() {
-            loadCombinaisonsFromStorage();
-            populateCombinaisonSelect();
-            renderTaskView();
-            renderConnectors();
-            renderQuizQuestion();
-        };
-
-        function loadCombinaisonsFromStorage() {
-            try {
-                const savedCustom = localStorage.getItem('tcf_custom_combinaisons_2026');
-                const customList = savedCustom ? JSON.parse(savedCustom) : [];
-                combinaisons = [...defaultCombinaisons, ...customList];
-
-                const savedDrafts = localStorage.getItem('tcf_user_drafts_2026');
-                if (savedDrafts) userDrafts = JSON.parse(savedDrafts);
-            } catch (e) {
-                combinaisons = [...defaultCombinaisons];
-            }
-        }
-
-        function saveDraftsToStorage() {
-            try {
-                localStorage.setItem('tcf_user_drafts_2026', JSON.stringify(userDrafts));
-            } catch (e) {}
-        }
-
-        // TOAST HELPER
-        function showToast(message, iconClass = "fa-solid fa-circle-check text-emerald-400") {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-msg').textContent = message;
-            document.getElementById('toast-icon').className = iconClass;
-            toast.classList.remove('hidden');
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 3400);
-        }
-
-        // NAVIGATION TABS
-        function switchMainTab(tabName) {
-            ['simulador', 'methodologie', 'entrainement'].forEach(t => {
-                const section = document.getElementById(`module-${t}`);
-                const btn = document.getElementById(`nav-${t}`);
-                if (t === tabName) {
-                    section.classList.remove('hidden');
-                    btn.className = "px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-2 bg-red-600 text-white shadow";
-                } else {
-                    section.classList.add('hidden');
-                    btn.className = "px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-2 text-slate-300 hover:text-white";
-                }
-            });
-        }
-
-        // FILTER BY MONTH & POPULATE SELECT
-        function filterByMonth(month) {
-            currentMonthFilter = month;
-            const months = ['ALL', 'Octobre 2026', 'Septembre 2026', 'Août 2026', 'Importés / IA'];
-            months.forEach(m => {
-                const btn = document.getElementById(`month-${m}`);
-                if (!btn) return;
-                if (m === month) {
-                    btn.className = "px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-900 text-white shadow";
-                } else if (m === 'Importés / IA') {
-                    btn.className = "px-3 py-1.5 rounded-xl text-xs font-bold transition bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100";
-                } else {
-                    btn.className = "px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200";
-                }
-            });
-
-            populateCombinaisonSelect();
-        }
-
-        function populateCombinaisonSelect() {
-            const select = document.getElementById('combinaison-select');
-            select.innerHTML = "";
-            const filtered = currentMonthFilter === "ALL"
-                ? combinaisons
-                : combinaisons.filter(c => c.month === currentMonthFilter);
-
-            if (filtered.length === 0) {
-                const opt = document.createElement('option');
-                opt.value = "";
-                opt.textContent = "Aucune combinaison dans ce mois (Cliquez sur '+ Importer / IA Sujet')";
-                select.appendChild(opt);
-                return;
-            }
-
-            filtered.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c.id;
-                opt.textContent = c.title;
-                select.appendChild(opt);
-            });
-
-            if (!filtered.some(c => c.id === currentCombinaisonId)) {
-                currentCombinaisonId = filtered[0].id;
-            }
-            select.value = currentCombinaisonId;
-            renderTaskView();
-        }
-
-        function handleCombinaisonChange(combId) {
-            if (!combId) return;
-            saveCurrentDraft();
-            currentCombinaisonId = combId;
-            renderTaskView();
-            const comb = getCurrentCombinaison();
-            showToast(`Combinaison chargée : ${comb.title}`);
-        }
-
-        function getCurrentCombinaison() {
-            return combinaisons.find(c => c.id === currentCombinaisonId) || combinaisons[0];
-        }
-
-        function selectTask(taskNum) {
-            saveCurrentDraft();
-            currentTask = taskNum;
-            renderTaskView();
-        }
-
-        function saveCurrentDraft() {
-            const editor = document.getElementById('essay-editor');
-            if (!editor) return;
-            const key = `${currentCombinaisonId}-${currentTask}`;
-            userDrafts[key] = editor.value;
-            saveDraftsToStorage();
-        }
-
-        // RENDER MAIN SIMULATOR VIEW
-        function renderTaskView() {
-            const comb = getCurrentCombinaison();
-            const taskData = comb.tasks[currentTask];
-
-            // Task Tabs Styling
-            [1, 2, 3].forEach(num => {
-                const btn = document.getElementById(`tab-tache-${num}`);
-                if (num === currentTask) {
-                    btn.className = "p-3.5 rounded-2xl border text-left transition flex flex-col justify-between bg-slate-900 text-white border-slate-900 shadow-md";
-                } else {
-                    btn.className = "p-3.5 rounded-2xl border text-left transition flex flex-col justify-between bg-white text-slate-700 border-slate-200 hover:border-slate-400";
-                }
-            });
-
-            // Pacing hint
-            const paceHints = { 1: "Conseil: 10m T1", 2: "Conseil: 20m T2", 3: "Conseil: 30m T3" };
-            document.getElementById('timer-pace-hint').textContent = paceHints[currentTask];
-
-            // Consigne & Badges
-            document.getElementById('task-badge').textContent = `Tâche ${currentTask}`;
-            document.getElementById('combinaison-badge').textContent = comb.title.split('(')[0].trim();
-            document.getElementById('task-word-target').textContent = `Exigence : ${taskData.min} mots minimum / ${taskData.max} mots maximum`;
-            document.getElementById('task-prompt').textContent = taskData.prompt;
-
-            // Tâche 3 Documents & Split Meter
-            const docsBox = document.getElementById('tache3-docs');
-            const splitMeter = document.getElementById('tache3-split-meter');
-            if (currentTask === 3) {
-                docsBox.classList.remove('hidden');
-                docsBox.classList.add('grid');
-                document.getElementById('doc1-content').textContent = taskData.doc1;
-                document.getElementById('doc2-content').textContent = taskData.doc2;
-                splitMeter.classList.remove('hidden');
-                splitMeter.classList.add('flex');
-            } else {
-                docsBox.classList.add('hidden');
-                docsBox.classList.remove('grid');
-                splitMeter.classList.add('hidden');
-                splitMeter.classList.remove('flex');
-            }
-
-            // Update Model Correction Content
-            document.getElementById('model-correction-text').textContent = taskData.model;
-            const modelWords = countFrenchWords(taskData.model);
-            document.getElementById('model-word-count-badge').textContent = `Longueur du corrigé : ${modelWords} mots (Conforme TCF Canada)`;
-
-            // Restore User Draft
-            const key = `${currentCombinaisonId}-${currentTask}`;
-            document.getElementById('essay-editor').value = userDrafts[key] || "";
-            document.getElementById('ai-evaluation-panel').classList.add('hidden');
-
-            updateWordCounterAndChecklist();
-        }
-
-        // WORD COUNTER & LIVE METHODOLOGY CHECKLIST
-        function countFrenchWords(text) {
-            const cleaned = text.trim();
-            if (!cleaned) return 0;
-            return cleaned
-                .replace(/aujourd'hui/gi, "aujourdhui")
-                .split(/[\s']+/)
-                .filter(w => w.length > 0).length;
-        }
-
-        function handleEditorInput() {
-            saveCurrentDraft();
-            updateWordCounterAndChecklist();
-        }
-
-        function updateWordCounterAndChecklist() {
-            const text = document.getElementById('essay-editor').value;
-            const count = countFrenchWords(text);
-            const taskData = getCurrentCombinaison().tasks[currentTask];
-
-            const badge = document.getElementById('word-traffic-light');
-            const dot = document.getElementById('traffic-dot');
-            const numSpan = document.getElementById('word-count-number');
-            const statusSpan = document.getElementById('word-status-label');
-
-            numSpan.textContent = `${count} ${count <= 1 ? 'mot' : 'mots'}`;
-
-            if (count < taskData.min) {
-                const missing = taskData.min - count;
-                badge.className = "px-3.5 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-2 bg-amber-100 border-amber-300 text-amber-900 transition-all";
-                dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
-                statusSpan.textContent = `(Il manque ${missing} mots pour atteindre ${taskData.min})`;
-            } else if (count >= taskData.min && count <= taskData.max) {
-                badge.className = "px-3.5 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-2 bg-emerald-100 border-emerald-400 text-emerald-900 transition-all";
-                dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500";
-                statusSpan.textContent = `✓ Parfait (${taskData.min}–${taskData.max} mots)`;
-            } else {
-                const extra = count - taskData.max;
-                badge.className = "px-3.5 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-2 blink-red transition-all";
-                dot.className = "w-2.5 h-2.5 rounded-full bg-red-600";
-                statusSpan.textContent = `⚠️ Dépassement de +${extra} mots (Max ${taskData.max})`;
-            }
-
-            // Update Tâche 3 Two-Part Split Meter (Paragraph 1 vs Rest)
-            if (currentTask === 3) {
-                const paragraphs = text.trim().split(/\n\s*\n/).filter(p => p.trim().length > 0);
-                const p1Words = paragraphs.length > 0 ? countFrenchWords(paragraphs[0]) : 0;
-                const p2Words = paragraphs.length > 1 ? countFrenchWords(paragraphs.slice(1).join(" ")) : 0;
-
-                const b1 = document.getElementById('t3-part1-badge');
-                const b2 = document.getElementById('t3-part2-badge');
-                b1.textContent = `1re Partie (Synthèse): ${p1Words} mots (Cible: 40-60)`;
-                b2.textContent = `2e Partie (Opinion): ${p2Words} mots (Cible: 80-120)`;
-
-                b1.className = (p1Words >= 35 && p1Words <= 65)
-                    ? "px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold"
-                    : "px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-semibold";
-                b2.className = (p2Words >= 75 && p2Words <= 125)
-                    ? "px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold"
-                    : "px-2 py-0.5 rounded bg-purple-100 text-purple-800 font-semibold";
-            }
-
-            // Render Live Methodology Checklist
-            renderMethodologyChecklist(text);
-        }
-
-        function renderMethodologyChecklist(text) {
-            const subtitle = document.getElementById('checklist-subtitle');
-            subtitle.textContent = `Étapes obligatoires — Tâche ${currentTask}`;
-            const container = document.getElementById('methodology-checklist');
-            container.innerHTML = "";
-
-            const items = methodologyChecklists[currentTask] || [];
-            items.forEach(item => {
-                const passed = item.regex.test(text);
-                const div = document.createElement('div');
-                div.className = passed
-                    ? "p-2.5 rounded-xl border border-emerald-200 bg-emerald-50/70 text-emerald-900 flex items-center gap-2.5 font-semibold transition"
-                    : "p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 flex items-center gap-2.5 transition";
-                div.innerHTML = `
-                    <i class="${passed ? 'fa-solid fa-circle-check text-emerald-600' : 'fa-regular fa-circle text-slate-400'} text-sm"></i>
-                    <span>${item.label}</span>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        // MODEL CORRECTION ACTIONS
-        function toggleModelCorrection() {
-            const panel = document.getElementById('model-correction-panel');
-            panel.classList.toggle('hidden');
-        }
-
-        function loadModelIntoEditor() {
-            const modelText = getCurrentCombinaison().tasks[currentTask].model;
-            document.getElementById('essay-editor').value = modelText;
-            handleEditorInput();
-            showToast("Corrigé modèle C1 chargé dans l'éditeur !");
-        }
-
-        function speakModelCorrection() {
-            const modelText = getCurrentCombinaison().tasks[currentTask].model;
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(modelText);
-                utterance.lang = 'fr-FR';
-                utterance.rate = 0.95;
-                window.speechSynthesis.speak(utterance);
-                showToast("Lecture audio du corrigé modèle en cours...", "fa-solid fa-volume-high text-emerald-400");
-            }
-        }
-
-        function insertSkeletonForCurrentTask() {
-            const skeleton = taskSkeletons[currentTask];
-            document.getElementById('essay-editor').value = skeleton;
-            handleEditorInput();
-            showToast(`Squelette méthodologique Tâche ${currentTask} inséré !`);
-        }
-
-        function useMethodologyTemplate(taskNum) {
-            currentTask = taskNum;
-            const key = `${currentCombinaisonId}-${currentTask}`;
-            userDrafts[key] = taskSkeletons[taskNum];
-            saveDraftsToStorage();
-            switchMainTab('simulador');
-            renderTaskView();
-            showToast(`Squelette Tâche ${taskNum} prêt dans l'éditeur !`);
-        }
-
-        // INSERT CHARACTER OR CONNECTOR
-        function insertAtCursor(str) {
-            const editor = document.getElementById('essay-editor');
-            const start = editor.selectionStart;
-            const end = editor.selectionEnd;
-            const val = editor.value;
-            editor.value = val.substring(0, start) + str + val.substring(end);
-            editor.focus();
-            editor.selectionStart = editor.selectionEnd = start + str.length;
-            handleEditorInput();
-        }
-
-        function clearEditor() {
-            document.getElementById('essay-editor').value = "";
-            handleEditorInput();
-            document.getElementById('ai-evaluation-panel').classList.add('hidden');
-        }
-
-        // 60-MIN OFFICIAL EXAM TIMER
-        function toggleTimer() {
-            const btnText = document.getElementById('timer-btn-text');
-            const icon = document.getElementById('timer-icon');
-            if (isTimerRunning) {
-                clearInterval(timerInterval);
-                isTimerRunning = false;
-                btnText.textContent = "Reprendre";
-                icon.className = "fa-solid fa-play";
-            } else {
-                isTimerRunning = true;
-                btnText.textContent = "Pause";
-                icon.className = "fa-solid fa-pause";
-                timerInterval = setInterval(() => {
-                    if (timerSeconds > 0) {
-                        timerSeconds--;
-                        const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
-                        const secs = String(timerSeconds % 60).padStart(2, '0');
-                        document.getElementById('timer-display').textContent = `${mins}:${secs}`;
-                    } else {
-                        clearInterval(timerInterval);
-                        isTimerRunning = false;
-                        showToast("Temps écoulé ! (60 minutes)", "fa-solid fa-bell text-amber-400");
-                    }
-                }, 1000);
-            }
-        }
-
-        function resetTimer() {
-            clearInterval(timerInterval);
-            isTimerRunning = false;
-            timerSeconds = 60 * 60;
-            document.getElementById('timer-display').textContent = "60:00";
-            document.getElementById('timer-btn-text').textContent = "Démarrer";
-            document.getElementById('timer-icon').className = "fa-solid fa-play";
-        }
-
-        // CONNECTORS SIDEBAR
-        function filterConnectors(cat) {
-            currentConnectorFilter = cat;
-            ['all', 'synthese', 'ajouter', 'nuancer', 'conclure'].forEach(c => {
-                const btn = document.getElementById(`conn-cat-${c}`);
-                btn.className = c === cat
-                    ? "text-xs px-2.5 py-1 rounded-lg font-bold bg-slate-900 text-white"
-                    : "text-xs px-2.5 py-1 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200";
-            });
-            renderConnectors();
-        }
-
-        function renderConnectors() {
-            const container = document.getElementById('connectors-list');
-            container.innerHTML = "";
-            const list = currentConnectorFilter === 'all'
-                ? connectorsData
-                : connectorsData.filter(c => c.cat === currentConnectorFilter);
-
-            list.forEach(item => {
-                const div = document.createElement('div');
-                div.className = "p-2.5 rounded-xl border border-slate-200 hover:border-red-400 hover:bg-red-50/30 cursor-pointer transition group flex items-center justify-between";
-                div.onclick = () => {
-                    insertAtCursor(item.fr + " ");
-                    showToast(`Inséré : "${item.fr}"`);
-                };
-                div.innerHTML = `
-                    <div>
-                        <div class="font-bold text-xs text-slate-800 group-hover:text-red-700">${item.fr}</div>
-                        <div class="text-[11px] text-slate-500">${item.es}</div>
-                    </div>
-                    <span class="text-[10px] font-extrabold px-2 py-0.5 rounded bg-indigo-100 text-indigo-800">${item.level}</span>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        // AI EVALUATION (OFFICIAL TCF CANADA / NCLC BARÈME)
-        async function evaluateEssayWithAI() {
-            const userText = document.getElementById('essay-editor').value.trim();
-            if (userText.length < 15) {
-                showToast("Écrivez votre texte ou cliquez sur 'Voir Correction Modèle' pour charger un exemple.", "fa-solid fa-triangle-exclamation text-amber-400");
-                return;
-            }
-
-            const btn = document.getElementById('btn-evaluate');
-            const originalHTML = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Évaluation TCF Canada en cours...</span>`;
-
-            const comb = getCurrentCombinaison();
-            const taskData = comb.tasks[currentTask];
-            const wordCount = countFrenchWords(userText);
-
-            const apiKey = "";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-            const systemPrompt = `Tu es un correcteur officiel du TCF Canada (France Éducation International / IRCC).
-Évalue la copie du candidat pour la Tâche ${currentTask} (${comb.title}).
-Consigne : "${taskData.prompt}"
- ${currentTask === 3 ? `Document 1: ${taskData.doc1}\nDocument 2: ${taskData.doc2}` : ''}
-Fourchette exigée : ${taskData.min} à ${taskData.max} mots. Mots écrits par le candidat : ${wordCount}.
-Donne le niveau NCLC estimé (ex: NCLC 7 • B2, NCLC 9 • C1, NCLC 10 • C1+), la note sur 20, l'évaluation des 4 critères, un diagnostic détaillé en espagnol et français, 3 corrections précises, et une réécriture C1.`;
-
-            const payload = {
-                contents: [{ role: "user", parts: [{ text: userText }] }],
-                systemInstruction: { parts: [{ text: systemPrompt }] },
-                generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "OBJECT",
-                        properties: {
-                            nclcBadge: { type: "STRING" },
-                            score20: { type: "STRING" },
-                            critConsigne: { type: "STRING" },
-                            critCoherence: { type: "STRING" },
-                            critLexique: { type: "STRING" },
-                            critGrammaire: { type: "STRING" },
-                            feedback: { type: "STRING" },
-                            corrections: { type: "ARRAY", items: { type: "STRING" } },
-                            c1Rewrite: { type: "STRING" }
-                        },
-                        required: ["nclcBadge", "score20", "critConsigne", "critCoherence", "critLexique", "critGrammaire", "feedback", "corrections", "c1Rewrite"]
-                    }
-                }
-            };
-
-            let resultData = null;
-            try {
-                const res = await fetch(apiUrl, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    const textJson = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-                    if (textJson) resultData = JSON.parse(textJson);
-                }
-            } catch (e) {}
-
-            // Smart local fallback if offline or API key not injected
-            if (!resultData) {
-                const inRange = wordCount >= taskData.min && wordCount <= taskData.max;
-                const hasC1 = /(néanmoins|toutefois|en outre|en définitive|d'une part|pour ma part|force est de constater)/i.test(userText);
-                resultData = {
-                    nclcBadge: inRange && hasC1 ? "NCLC 9–10 • C1" : (inRange ? "NCLC 7–8 • B2" : "NCLC 6 • B1"),
-                    score20: inRange && hasC1 ? "16 / 20" : (inRange ? "13.5 / 20" : "10 / 20"),
-                    critConsigne: inRange ? "Respectée ✓" : "Hors limite ⚠️",
-                    critCoherence: hasC1 ? "Très fluide (C1)" : "Correcte (B2)",
-                    critLexique: hasC1 ? "Riche & varié" : "Standard",
-                    critGrammaire: "Bonne maîtrise",
-                    feedback: inRange
-                        ? `Excelente trabajo: tu texto tiene ${wordCount} palabras, cumpliendo estrictamente el rango oficial de la Tâche ${currentTask} (${taskData.min}–${taskData.max} mots). Has estructurado bien los párrafos según la metodología de Réussir TCF Canada.`
-                        : `Atención prioritaria al conteo: has escrito ${wordCount} palabras, pero la Tâche ${currentTask} exige estrictamente entre ${taskData.min} y ${taskData.max} palabras. En el TCF Canada, salir del rango penaliza directamente el nivel NCLC.`,
-                    corrections: [
-                        hasC1
-                            ? "✓ Excelente uso de articuladores lógicos de nivel C1 para estructurar tu discurso."
-                            : "💡 Añade al menos 2 conectores avanzados de la columna derecha (ej. 'Toutefois', 'En outre', 'En définitive') para asegurar NCLC 9+.",
-                        currentTask === 3
-                            ? "💡 En Tâche 3, verifica que el párrafo 1 (Síntesis) tenga entre 40 y 60 palabras sin copiar frases textuales de los documentos."
-                            : "💡 Verifica en el Checklist de la derecha que hayas incluido tanto el 'Objet:' como la pregunta o expectativa final.",
-                        "✓ Recuerda revisar la concordancia de participios pasados y el uso de al menos un subjuntivo para puntuar C1 en gramática."
-                    ],
-                    c1Rewrite: taskData.model
-                };
-            }
-
-            document.getElementById('eval-nclc-badge').textContent = resultData.nclcBadge;
-            document.getElementById('eval-score-badge').textContent = `Score TCF : ${resultData.score20}`;
-            document.getElementById('crit-consigne').textContent = resultData.critConsigne;
-            document.getElementById('crit-coherence').textContent = resultData.critCoherence;
-            document.getElementById('crit-lexique').textContent = resultData.critLexique;
-            document.getElementById('crit-grammaire').textContent = resultData.critGrammaire;
-            document.getElementById('eval-feedback').textContent = resultData.feedback;
-
-            const corrUl = document.getElementById('eval-corrections');
-            corrUl.innerHTML = "";
-            resultData.corrections.forEach(c => {
-                const li = document.createElement('li');
-                li.className = "bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-700";
-                li.textContent = c;
-                corrUl.appendChild(li);
-            });
-
-            document.getElementById('eval-c1-rewrite').textContent = resultData.c1Rewrite;
-            document.getElementById('ai-evaluation-panel').classList.remove('hidden');
-
-            btn.disabled = false;
-            btn.innerHTML = originalHTML;
-            document.getElementById('ai-evaluation-panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-
-        function copyC1Rewrite() {
-            const text = document.getElementById('eval-c1-rewrite').textContent;
-            const temp = document.createElement('textarea');
-            temp.value = text;
-            document.body.appendChild(temp);
-            temp.select();
-            document.execCommand('copy');
-            document.body.removeChild(temp);
-            showToast("Réécriture C1 copiée dans le presse-papiers !");
-        }
-
-        // MODAL: IMPORT OR GENERATE NEW COMBINAISON
-        function openImportModal() {
-            const m = document.getElementById('import-modal');
-            m.classList.remove('hidden');
-            m.classList.add('flex');
-        }
-
-        function closeImportModal() {
-            const m = document.getElementById('import-modal');
-            m.classList.add('hidden');
-            m.classList.remove('flex');
-        }
-
-        async function generateCombinaisonWithAI() {
-            const topic = document.getElementById('ai-topic-input').value.trim() || "Vie au Canada et technologies";
-            const btn = document.getElementById('btn-gen-ai');
-            const orig = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Création...`;
-
-            const apiKey = "";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-            const payload = {
-                contents: [{
-                    role: "user",
-                    parts: [{ text: `Crée une nouvelle Combinaison officielle d'Expression Écrite du TCF Canada sur le thème : "${topic}". Inclus les consignes de Tâche 1, Tâche 2, Tâche 3 (avec Document 1 et Document 2 opposés) et les 3 corrigés modèles de niveau C1.` }]
-                }],
-                generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "OBJECT",
-                        properties: {
-                            title: { type: "STRING" },
-                            t1Prompt: { type: "STRING" },
-                            t1Model: { type: "STRING" },
-                            t2Prompt: { type: "STRING" },
-                            t2Model: { type: "STRING" },
-                            t3Prompt: { type: "STRING" },
-                            t3Doc1: { type: "STRING" },
-                            t3Doc2: { type: "STRING" },
-                            t3Model: { type: "STRING" }
-                        },
-                        required: ["title", "t1Prompt", "t1Model", "t2Prompt", "t2Model", "t3Prompt", "t3Doc1", "t3Doc2", "t3Model"]
-                    }
-                }
-            };
-
-            let gen = null;
-            try {
-                const res = await fetch(apiUrl, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    const txt = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-                    if (txt) gen = JSON.parse(txt);
-                }
-            } catch (e) {}
-
-            if (!gen) {
-                gen = {
-                    title: `Sujet IA — ${topic}`,
-                    t1Prompt: `Vous écrivez un courriel à un(e) ami(e) francophone au sujet de "${topic}". Vous lui expliquez votre situation actuelle et lui proposez une rencontre prochainement.`,
-                    t1Model: taskSkeletons[1],
-                    t2Prompt: `Sur votre blog personnel, vous partagez votre expérience récente concernant "${topic}". Décrivez ce que vous avez vécu et donnez votre avis aux lecteurs.`,
-                    t2Model: taskSkeletons[2],
-                    t3Prompt: `Débat autour de : ${topic}. Résumez les deux documents (40-60 mots) et donnez votre avis argumenté (80-120 mots).`,
-                    t3Doc1: `« Le développement de "${topic}" apporte des bénéfices considérables au quotidien en modernisant nos habitudes et en facilitant les échanges. »`,
-                    t3Doc2: `« Toutefois, certains spécialistes rappellent que "${topic}" comporte des risques d'excès et nécessite un encadrement strict pour protéger les citoyens. »`,
-                    t3Model: taskSkeletons[3]
-                };
-            }
-
-            document.getElementById('imp-title').value = gen.title;
-            document.getElementById('imp-t1').value = gen.t1Prompt;
-            document.getElementById('imp-t2').value = gen.t2Prompt;
-            document.getElementById('imp-t3-prompt').value = gen.t3Prompt;
-            document.getElementById('imp-t3-doc1').value = gen.t3Doc1;
-            document.getElementById('imp-t3-doc2').value = gen.t3Doc2;
-
-            btn.disabled = false;
-            btn.innerHTML = orig;
-            showToast("Sujet généré ! Cliquez sur 'Enregistrer la Combinaison'");
-        }
-
-        function saveImportedCombinaison() {
-            const month = document.getElementById('imp-month').value.trim() || "Importés / IA";
-            const title = document.getElementById('imp-title').value.trim() || "Nouvelle Combinaison Personnalisée";
-            const t1 = document.getElementById('imp-t1').value.trim();
-            const t2 = document.getElementById('imp-t2').value.trim();
-            const t3Prompt = document.getElementById('imp-t3-prompt').value.trim();
-            const doc1 = document.getElementById('imp-t3-doc1').value.trim();
-            const doc2 = document.getElementById('imp-t3-doc2').value.trim();
-
-            if (!t1 || !t2) {
-                showToast("Veuillez remplir au moins les consignes des Tâches 1 et 2", "fa-solid fa-circle-exclamation text-amber-400");
-                return;
-            }
-
-            const newComb = {
-                id: "custom-" + Date.now(),
-                month: month,
-                title: title,
-                tasks: {
-                    1: { min: 60, max: 120, prompt: t1, model: taskSkeletons[1] },
-                    2: { min: 120, max: 150, prompt: t2, model: taskSkeletons[2] },
-                    3: {
-                        min: 120, max: 180,
-                        prompt: t3Prompt || "Résumez les deux points de vue (40-60 mots) et donnez votre opinion argumentée (80-120 mots).",
-                        doc1: doc1 || "Document 1 : Point de vue favorable.",
-                        doc2: doc2 || "Document 2 : Point de vue critique.",
-                        model: taskSkeletons[3]
-                    }
-                }
-            };
-
-            combinaisons.push(newComb);
-            try {
-                const customOnly = combinaisons.filter(c => c.id.startsWith("custom-"));
-                localStorage.setItem('tcf_custom_combinaisons_2026', JSON.stringify(customOnly));
-            } catch (e) {}
-
-            currentMonthFilter = "ALL";
-            currentCombinaisonId = newComb.id;
-            populateCombinaisonSelect();
-            closeImportModal();
-            showToast("Nouvelle Combinaison enregistrée avec succès !");
-        }
-
-        // QUIZ LOGIC
-        function renderQuizQuestion() {
-            const q = quizQuestions[currentQuizIndex];
-            document.getElementById('quiz-basic-word').textContent = q.basicWord;
-            document.getElementById('quiz-sentence').textContent = q.sentence;
-            document.getElementById('quiz-translation').textContent = q.translation;
-            document.getElementById('quiz-progress-text').textContent = `Question ${currentQuizIndex + 1} sur ${quizQuestions.length}`;
-            document.getElementById('quiz-total').textContent = quizQuestions.length;
-
-            const box = document.getElementById('quiz-options');
-            box.innerHTML = "";
-            document.getElementById('quiz-feedback').classList.add('hidden');
-
-            q.options.forEach((opt, idx) => {
-                const btn = document.createElement('button');
-                btn.className = "w-full text-left px-4 py-3 rounded-xl border border-slate-300 bg-white hover:border-slate-900 font-bold text-sm text-slate-800 transition flex items-center justify-between";
-                btn.innerHTML = `<span>${opt}</span> <i class="fa-regular fa-circle text-slate-300"></i>`;
-                btn.onclick = () => selectQuizAnswer(idx);
-                box.appendChild(btn);
-            });
-        }
-
-        function selectQuizAnswer(selectedIndex) {
-            const q = quizQuestions[currentQuizIndex];
-            const fb = document.getElementById('quiz-feedback');
-            const buttons = document.getElementById('quiz-options').children;
-
-            for (let i = 0; i < buttons.length; i++) {
-                buttons[i].disabled = true;
-                if (i === q.correct) {
-                    buttons[i].className = "w-full text-left px-4 py-3 rounded-xl border-2 border-emerald-500 bg-emerald-50 font-bold text-sm text-emerald-900 flex items-center justify-between";
-                    buttons[i].innerHTML = `<span>${q.options[i]}</span> <i class="fa-solid fa-circle-check text-emerald-600"></i>`;
-                } else if (i === selectedIndex) {
-                    buttons[i].className = "w-full text-left px-4 py-3 rounded-xl border-2 border-red-400 bg-red-50 font-bold text-sm text-red-900 flex items-center justify-between";
-                    buttons[i].innerHTML = `<span>${q.options[i]}</span> <i class="fa-solid fa-circle-xmark text-red-600"></i>`;
-                }
-            }
-
-            if (selectedIndex === q.correct && !answeredQuestions[currentQuizIndex]) {
-                quizScore++;
-                answeredQuestions[currentQuizIndex] = true;
-                document.getElementById('quiz-score').textContent = quizScore;
-            }
-
-            fb.className = selectedIndex === q.correct
-                ? "mt-4 p-3.5 rounded-xl text-xs sm:text-sm font-medium bg-emerald-100 text-emerald-900 border border-emerald-300"
-                : "mt-4 p-3.5 rounded-xl text-xs sm:text-sm font-medium bg-amber-100 text-amber-900 border border-amber-300";
-            fb.textContent = q.explanation;
-            fb.classList.remove('hidden');
-        }
-
-        function nextQuizQuestion() {
-            currentQuizIndex = (currentQuizIndex + 1) % quizQuestions.length;
-            renderQuizQuestion();
-        }
-
-        function prevQuizQuestion() {
-            currentQuizIndex = (currentQuizIndex - 1 + quizQuestions.length) % quizQuestions.length;
-            renderQuizQuestion();
-        }
-
-        // EXPORT CURRENT COMBINAISON ESSAYS (.TXT)
-        function exportCurrentCombinaison() {
-            saveCurrentDraft();
-            const comb = getCurrentCombinaison();
-            let txt = `====================================================\n`;
-            txt += `RÉUSSIR TCF CANADA — RAPPORT D'ENTRAÎNEMENT (2026)\n`;
-            txt += `${comb.title}\n`;
-            txt += `====================================================\n\n`;
-
-            [1, 2, 3].forEach(t => {
-                const draft = userDrafts[`${comb.id}-${t}`] || "(Non rédigé)";
-                const wc = countFrenchWords(userDrafts[`${comb.id}-${t}`] || "");
-                txt += `--- TÂCHE ${t} (${wc} mots) ---\n`;
-                txt += `Consigne : ${comb.tasks[t].prompt}\n\n`;
-                txt += `Ma rédaction :\n${draft}\n\n`;
-                txt += `Corrigé Modèle C1 :\n${comb.tasks[t].model}\n\n`;
-            });
-
-            const blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `TCF_Canada_${comb.id}.txt`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showToast("Vos rédactions et les corrigés C1 ont été téléchargés (.txt) !");
-        }
-    </script>
+  </div>
+
+  <script>
+    function countWords(str) {
+      str = str.replace(/(^\s*)|(\s*$)/gi, "");
+      str = str.replace(/[ ]{2,}/gi, " ");
+      str = str.replace(/\n /, "\n");
+      if (str.length === 0) return 0;
+      return str.split(' ').length;
+    }
+
+    function updateWordCount(taskId, min, max) {
+      const text = document.getElementById(`task${taskId}-text`).value;
+      const count = countWords(text);
+      const counterEl = document.getElementById(`task${taskId}-count`);
+      
+      counterEl.textContent = `${count} mots`;
+      counterEl.className = 'word-count';
+      
+      if (count < min) {
+        counterEl.classList.add('status-yellow');
+      } else if (count > max) {
+        counterEl.classList.add('status-red');
+      } else {
+        counterEl.classList.add('status-green');
+      }
+    }
+
+    function insertChar(elementId, char) {
+      const el = document.getElementById(elementId);
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      const text = el.value;
+      const before = text.substring(0, start);
+      const after  = text.substring(end, text.length);
+      el.value = (before + char + after);
+      el.selectionStart = el.selectionEnd = start + 1;
+      el.focus();
+      // Trigger word count
+      const taskNum = elementId.charAt(4);
+      if(taskNum == 1) updateWordCount(1, 60, 120);
+      if(taskNum == 2) updateWordCount(2, 120, 150);
+      if(taskNum == 3) updateWordCount(3, 120, 180);
+    }
+
+    function toggleCorrection(taskId) {
+      const el = document.getElementById(`correction${taskId}`);
+      if (el.style.display === 'block') {
+        el.style.display = 'none';
+      } else {
+        el.style.display = 'block';
+      }
+    }
+
+    function checkMethodology(taskId) {
+      const text = document.getElementById(`task${taskId}-text`).value.toLowerCase();
+      const count = countWords(text);
+
+      if(taskId === 1) {
+        if(text.includes('salut') || text.includes('bonjour') || text.includes('coucou')) setCheck('c1-1', true); else setCheck('c1-1', false);
+        if(text.includes(' tu ') || text.includes(' toi ') || text.includes(' te ')) setCheck('c1-2', true); else setCheck('c1-2', false);
+        if(count >= 60 && count <= 120) setCheck('c1-3', true); else setCheck('c1-3', false);
+      }
+      if(taskId === 2) {
+        if(text.includes(' ai ') || text.includes(' étai') || text.includes(' suis ')) setCheck('c2-1', true); else setCheck('c2-1', false);
+        if(text.includes('avis') || text.includes('pense') || text.includes('crois')) setCheck('c2-2', true); else setCheck('c2-2', false);
+        if(count >= 120 && count <= 150) setCheck('c2-3', true); else setCheck('c2-3', false);
+      }
+      if(taskId === 3) {
+        if(text.includes('revanche') || text.includes('cependant') || text.includes('mais') || text.includes('contrairement')) setCheck('c3-1', true); else setCheck('c3-1', false);
+        if(text.includes('premier') || text.includes('second') || text.includes('opinion') || text.includes('sens')) setCheck('c3-2', true); else setCheck('c3-2', false);
+        if(count >= 120 && count <= 180) setCheck('c3-3', true); else setCheck('c3-3', false);
+      }
+    }
+
+    function setCheck(id, isMet) {
+      const el = document.getElementById(id);
+      if(isMet) {
+        el.classList.add('met');
+        el.querySelector('.checklist-icon').textContent = '✔';
+      } else {
+        el.classList.remove('met');
+        el.querySelector('.checklist-icon').textContent = '✖';
+      }
+    }
+  </script>
 </body>
 </html>
